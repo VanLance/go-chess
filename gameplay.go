@@ -19,7 +19,14 @@ type Move struct{
 	player Player
 }
 
-func (c ChessPlay) driver(){
+func createChess() ChessPlay{
+	gameBoard := GameBoard{}
+	gameBoard.startingBoard()
+	gameBoard.displayBoard()
+	return ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
+}
+
+func (c *ChessPlay) driver(){
 	move := c.player1.selectMove(Position{1,2},Position{1,4})
 	c.makeMove(move)
 	move = c.player2.selectMove(Position{2,7},Position{2,5})

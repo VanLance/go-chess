@@ -5,12 +5,6 @@ import (
 	"testing"
 )
 
-func createChess() ChessPlay{
-	gameBoard := GameBoard{}
-	gameBoard.startingBoard()
-	gameBoard.displayBoard()
-	return ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
-}
 
 func TestCapture( t *testing.T){
 	gameBoard := GameBoard{}
