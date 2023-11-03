@@ -110,6 +110,7 @@ func (g *GameBoard) startingBoard() {
 func (g GameBoard) displayBoard(){
 	letters := []string{"  |    A     |","   B     |","   C     |","   D     |","   E     |","   F     |","   G     |","   H     |  "}
 	fmt.Println(letters)
+	fmt.Println("   _______________________________________________________________________________________")
 	for numberY := 8; numberY > 0; numberY-- {
 		var row []string
 		row = append(row, strconv.Itoa(numberY),"|")

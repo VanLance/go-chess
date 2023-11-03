@@ -30,12 +30,8 @@ func (p Player) selectMoveWithString(startingPosition, landingPosition string) M
 }
 
 func convertFirstCharacterToInt(char byte) int{
-	fmt.Println(string(char))
 	for i, letter := range "ABCDEFGH"{
 		if strings.ToUpper(string(char)) == string(letter) {
-			
-			fmt.Printf("%v type of i is %T \n", i+1, i)
-
 			return i + 1
 		}
 	}
