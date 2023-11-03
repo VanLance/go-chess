@@ -3,15 +3,14 @@ package main
 // import "fmt"
 
 type Condition struct{
-	conditionName string
-	moved bool
-	capture string
+	name string
+	active bool
 }
 
 type MovementType struct{
 	x int
 	y int
-	condition string
+	condition Condition
 }
 
 type GamePiece struct{
@@ -38,16 +37,17 @@ var pawn = GamePiece{
 		{
 			x:0,
 			y:1,
+			condition: Condition{name:"capture", active: false},
 		},
 		{
 			x:0,
 			y:2,
-			condition: "moved",
+			condition: Condition{name:"moved", active: false},
 		},
 		{
 			x:1,
 			y:1,
-			condition: "capture",
+			condition: Condition{name:"capture", active: true},
 		},
 	},
 	distance: false,

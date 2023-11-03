@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -53,20 +54,20 @@ func TestCapture( t *testing.T){
 func TestPath( t *testing.T){
 	gameBoard := GameBoard{}
 	gameBoard.startingBoard()
-	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
-	if chess.checkPath(Move{Position{1,1},Position{1,5}, chess.player1}) != false{
+	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"}, playerTurn: Player{name:"1"} }
+	if chess.checkPath(rook, Move{Position{1,1},Position{1,5}, chess.player1}) != false{
 		t.Errorf("Expect false pawn blocking rook  got true")
 	}
-	if chess.checkPath(Move{Position{1,2},Position{1,3}, chess.player1}) != true{
+	if chess.checkPath(pawn, Move{Position{1,2},Position{1,3}, chess.player1}) != true{
 		t.Errorf("Expect true pawn can move got false")
 	}
 	move := chess.player1.selectMove(Position{4,2},Position{4,3})
 	chess.acceptMove(move)
-	if chess.checkPath(Move{Position{3,1},Position{5,3}, chess.player1}) != true{
+	if chess.checkPath(bishop, Move{Position{3,1},Position{5,3}, chess.player1}) != true{
 		chess.displayBoard()
 		t.Errorf("Expect true pawn moved bishop clear got false")
 	}
-	if chess.checkPath(Move{Position{3,1},Position{1,3}, chess.player1}) != false{
+	if chess.checkPath(bishop, Move{Position{3,1},Position{1,3}, chess.player1}) != false{
 		t.Errorf("Expect false pawn blocking bishop got true")
 	}
 }
@@ -76,12 +77,12 @@ func TestMovesCondition( t *testing.T){
 	gameBoard.startingBoard()
 	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
 	pawn := chess.getPiece(Position{1,2})
-	result := chess.checkCondition(pawn, MovementType{x:0,y:2, condition: "moved"})
+	result := chess.checkCondition(pawn, MovementType{x:0,y:2, condition: Condition{name:"moved", active: false}})
 	if !result {
 		t.Errorf("Expect true pawn first move, two paces got %v", result)
 	}
 	pawn.capturing = true
-	result = chess.checkCondition(pawn, MovementType{x:1,y:1, condition:"capturing"})
+	result = chess.checkCondition(pawn, MovementType{x:1,y:1, condition: Condition{name:"capturing", active: true}})
 	if result {
 		t.Errorf("Expect false pawn not capturing, got %v", result)
 	}
@@ -90,40 +91,52 @@ func TestMovesCondition( t *testing.T){
 func TestValidMoves( t *testing.T){
 	gameBoard := GameBoard{}
 	gameBoard.startingBoard()
-	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
+	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"}, playerTurn: Player{name:"1"} }
 	if chess.checkMove(bishop, Move{Position{2,3},Position{4,5}, chess.player1}) != true {
 		t.Errorf("Expect true valid bishop move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(bishop, Move{Position{2,3},Position{3,4}, chess.player1}) != true {
 		t.Errorf("Expect true valid bishop move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(bishop, Move{Position{2,3},Position{2,2}, chess.player1}) != false {
 		t.Errorf("Expect false valid bishop move got false")
 	}
-	if chess.checkMove(pawn, Move{Position{2,3},Position{2,4}, chess.player1}) != true {
+	chess.playerTurn = Player{name:"1"}
+	fmt.Println(chess.playerTurn)
+	if chess.checkMove(pawn, Move{Position{2,2},Position{2,4}, chess.player1}) != true {
 		t.Errorf("Expect true valid pawn move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(pawn, Move{Position{2,2},Position{3,4}, chess.player1}) != false {
 		t.Errorf("Expect false invalid pawn move got true")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(pawn, Move{Position{2,3},Position{2,2}, chess.player1}) != false {
 		t.Errorf("Expect false invalid pawn move got true")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(rook, Move{Position{2,3},Position{2,6}, chess.player1}) != true {
 		t.Errorf("Expect true invalid rook move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(rook, Move{Position{2,3},Position{6,3}, chess.player1}) != true {
 		t.Errorf("Expect true invalid rook move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(rook, Move{Position{2,5},Position{2,3}, chess.player1}) != true {
 		t.Errorf("Expect true valid rook move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(rook, Move{Position{2,3},Position{3,4}, chess.player1}) != false {
 		t.Errorf("Expect false invalid rook move got true")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(knight, Move{Position{2,1},Position{3,3}, chess.player1}) != true {
 		t.Errorf("Expect true invalid knight move got false")
 	}
+	chess.playerTurn = Player{name:"1"}
 	if chess.checkMove(knight, Move{Position{2,1},Position{3,4}, chess.player1}) != false {
 		t.Errorf("Expect false invalid knight move got true")
 	}
@@ -134,7 +147,7 @@ func playerTurn(chess *ChessPlay, player Player, startingPosition, endingPositio
 	move := player.selectMove(startingPosition,endingPosition)
 	if chess.checkPiece(move){
 		piece := chess.getPiece(move.startingPosition)
-		if chess.checkValidLanding(&piece, move.endingPosition) && chess.checkMove(piece, move) && chess.checkPath(move) {
+		if chess.checkValidLanding(&piece, move.endingPosition) && chess.checkMove(piece, move) && chess.checkPath(piece, move) {
 			chess.acceptMove(move)
 			chess.moveTurn()
 			chess.displayBoard()

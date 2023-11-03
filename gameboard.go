@@ -108,23 +108,28 @@ func (g *GameBoard) startingBoard() {
 }
 
 func (g GameBoard) displayBoard(){
-	letters := []string{"  A1  ","  B2  ","  C3  ","  D4  ","  E5  ","  F6  ","  G7   ","  H8   "}
+	letters := []string{"  |    A     |","   B     |","   C     |","   D     |","   E     |","   F     |","   G     |","   H     |  "}
 	fmt.Println(letters)
 	for numberY := 8; numberY > 0; numberY-- {
 		var row []string
-		row = append(row, strconv.Itoa(numberY))
+		row = append(row, strconv.Itoa(numberY),"|")
 		for numberX:= 1; numberX <= 8; numberX++{
-			currentPiece := evenCells(g.squares[Position{x:numberX,y: numberY}].gamePiece.name)
-			row = append(row, currentPiece)
+			piece := g.squares[Position{x:numberX,y: numberY}].gamePiece
+			pieceName := evenCells(piece.name)
+			row = append(row, pieceName,piece.player.name, "|")
 		}
 		row = append(row, strconv.Itoa(numberY))
 		fmt.Println(row)
+		fmt.Println("   _______________________________________________________________________________________")
 	}
 	fmt.Println(letters)
 }
 
 func evenCells(word string) string{
 	remainingLength := 6 - len(word)
+	if word == ""{
+		remainingLength ++
+	}
 	for i:=0; i<remainingLength; i++{
 		word += " "
 	}
