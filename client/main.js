@@ -20,7 +20,7 @@ async function firstMove() {
     headers: {
       "Content-Type": 'application/json'
     },
-    bodY: JSON.stringify({
+    body: JSON.stringify({
       previousState: [...pieces.PlayerOnePieces, ...pieces.PlayerTwoPieces],
       move: {
         startingPosition: "A2",

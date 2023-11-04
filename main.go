@@ -51,22 +51,41 @@ func handleStart(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// func handleMove(w http.ResponseWriter, r *http.Request){
+// 	var m MoveReq
+	
+// 	err := json.NewDecoder(r.Body).Decode(&m)
+// 	if err != nil{
+// 		fmt.Println(err)
+// 	}
+// 	chess := recreateBoard(m.PreviousState)
+// 	fmt.Println(m.ClientMove.StartingPosition == "", m.ClientMove.LandingPosition == "", chess.playerTurn , "++++++=========")
+// 	fmt.Println(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition, chess.playerTurn , "++++++=========")
+// 	move := chess.playerTurn.selectMoveWithString(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition)
+// 	// fmt.Println(move, chess.GameBoard.squares[Position{X:1, Y:2}], "===================")
+// 	chess.makeMove(move)
+// 	fmt.Println("MADE MOVE")
+// 	chess.displayBoard()
+// }
+
 func handleMove(w http.ResponseWriter, r *http.Request){
 	var m MoveReq
 	
 	err := json.NewDecoder(r.Body).Decode(&m)
 	if err != nil{
-		fmt.Println(err)
+		fmt.Println("Error decoding:", err)
 	}
+	fmt.Printf("Received data: %+v\n", m)
+
 	chess := recreateBoard(m.PreviousState)
-	fmt.Println(m.ClientMove.StartingPosition == "", m.LandingPosition == "", chess.playerTurn , "++++++=========")
-	fmt.Println(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition, chess.playerTurn , "++++++=========")
-	move := chess.playerTurn.selectMoveWithString(m.StartingPosition , m.LandingPosition)
-	// fmt.Println(move, chess.GameBoard.squares[Position{X:1, Y:2}], "===================")
+	fmt.Printf("StartingPosition: %s, LandingPosition: %s, PlayerTurn: %+v\n", m.ClientMove.StartingPosition, m.ClientMove.LandingPosition, chess.playerTurn)
+
+	move := chess.playerTurn.selectMoveWithString(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition)
 	chess.makeMove(move)
 	fmt.Println("MADE MOVE")
 	chess.displayBoard()
 }
+
 
 func main() {
 	http.HandleFunc("/", handleStart)
@@ -77,7 +96,6 @@ func main() {
 func recreateBoard(pieces []GamePiece) ChessPlay{
 	chess :=  ChessPlay{GameBoard: GameBoard{}, player1:Player{Team:1}, player2: Player{Team:2} }
 	chess.addSquares()
-	fmt.Println("ADDED SQUARES")
 	chess.playerTurn = chess.player1
 	for _, piece := range pieces {
 		fmt.Println(piece)
