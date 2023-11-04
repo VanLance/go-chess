@@ -14,8 +14,8 @@ type ChessPlay struct {
 }
 
 type Move struct{
-	startingPosition Position
-	endingPosition Position
+	StartingPosition Position
+	LandingPosition Position
 	player Player
 }
 
@@ -23,7 +23,9 @@ func createChess() ChessPlay{
 	gameBoard := GameBoard{}
 	gameBoard.startingBoard()
 	gameBoard.displayBoard()
-	return ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"} }
+	chess :=  ChessPlay{GameBoard: gameBoard, player1:Player{Team:1}, player2: Player{Team:2} }
+	chess.playerTurn = chess.player1
+	return chess
 }
 
 func (c *ChessPlay) driver(){
@@ -58,23 +60,23 @@ func (c *ChessPlay) driver(){
 
 func (c *ChessPlay) makeMove(move Move){
 	if  c.checkPiece(move){
-		piece := c.getPiece(move.startingPosition)
-		if c.checkValidLanding(&piece, move.endingPosition) && c.checkMove(piece, move) && c.checkPath(piece, move) {
+		piece := c.getPiece(move.StartingPosition)
+		if c.checkValidLanding(&piece, move.LandingPosition) && c.checkMove(piece, move) && c.checkPath(piece, move) {
 			c.acceptMove(move)
 			c.moveTurn()
 		}
 	}
 	c.displayBoard()
-	if c.winner.name != "" {
-		fmt.Println("\n", "Winner: ", c.winner.name)
+	if c.winner.Team != 0 {
+		fmt.Println("\n", "Winner: ", c.winner.Team)
   } else {
 		fmt.Println("\n", c.playerTurn, "'s turn")	
 	}
 }
 
 func (c ChessPlay) checkPiece(move Move) bool{
-	piecePlayer := c.squares[move.startingPosition].gamePiece.player
-	return c.playerTurn == move.player && piecePlayer.name == move.player.name
+	piecePlayer := c.squares[move.StartingPosition].gamePiece.Player
+	return c.playerTurn == move.player && piecePlayer.Team == move.player.Team
 }
 
 func (c ChessPlay) getPiece(position Position) GamePiece{
@@ -84,40 +86,41 @@ func (c ChessPlay) getPiece(position Position) GamePiece{
 func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 	if piece.back == false {
 		if c.playerTurn == c.player1{
-			return move.startingPosition.y < move.endingPosition.y
+			return move.StartingPosition.Y < move.LandingPosition.Y
 		} else {
-			return move.startingPosition.y > move.endingPosition.y
+			return move.StartingPosition.Y > move.LandingPosition.Y
 		}
 	}
 	return true
 }
 
 func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
-	spacesMoved := Position{getAbsolute(move.endingPosition.x- move.startingPosition.x), getAbsolute(move.endingPosition.y - move.startingPosition.y)}
+	fmt.Println("CHECK MOVE +++++++++++++++ FIX")
+	spacesMoved := Position{getAbsolute(move.LandingPosition.X - move.StartingPosition.X), getAbsolute(move.LandingPosition.Y - move.StartingPosition.Y)}
 	checkCondition := false
 	checkMove := MovementType{} 
 	if c.checkDirection(piece, move){
-		for _, validMove := range piece.movementTypes {
-			if spacesMoved.x == validMove.x && spacesMoved.y == validMove.y{
-				if validMove.condition.name != "" {
+		for _, validMove := range piece.MovementTypes {
+			if spacesMoved.X == validMove.X && spacesMoved.Y == validMove.Y{
+				if validMove.Condition.name != "" {
 					checkCondition = true
 					checkMove = validMove
 				}
 				isValidMove = true
 			}
-			if ( spacesMoved.x != 0 ) && ( spacesMoved.y != 0){
-				if ( validMove.x != 0 ) && ( validMove.y != 0) {
-					if spacesMoved.x / validMove.y == spacesMoved.y / validMove.y && piece.distance == true{
+			if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
+				if ( validMove.X != 0 ) && ( validMove.Y != 0) {
+					if spacesMoved.X / validMove.Y == spacesMoved.Y / validMove.Y && piece.distance == true{
 						isValidMove = true
 					}
 				}
-			} else if spacesMoved.x != 0 {
-				if validMove.x == 1 && validMove.y == 0 && piece.distance == true{
-					isValidMove = true
-				}
-			} else {
-				if validMove.x == 1 && validMove.y == 0 && piece.distance == true {
-					isValidMove = true
+				} else if spacesMoved.X != 0 {
+					if validMove.X == 1 && validMove.Y == 0 && piece.distance == true{
+						isValidMove = true
+					}
+					} else {
+						if validMove.X == 1 && validMove.Y == 0 && piece.distance == true {
+							isValidMove = true
 				}
 			} 
 		}
@@ -131,31 +134,32 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 }
 
 func (c ChessPlay) checkCondition(piece GamePiece, move MovementType) bool{
-	if move.condition.name == "moved"  {
-		return move.condition.active == piece.moved
+	if move.Condition.name == "moved"  {
+		return move.Condition.active == piece.Moved
 	}
-	if move.condition.name == "capture" {
-		return piece.capturing == move.condition.active
+	if move.Condition.name == "capture" {
+		return piece.capturing == move.Condition.active
 	}
 	return false
 }
 
 func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
-	if piece.name != "knight" {
-		spacesMoved := Position{ move.endingPosition.x - move.startingPosition.x, move.endingPosition.y - move.startingPosition.y }
-		currentSquare := move.startingPosition
-		for currentSquare != move.endingPosition{
-			if ( spacesMoved.x > 0 ) {
-				currentSquare.x++
-			} else if spacesMoved.x < 0 {
-				currentSquare.x--
+	fmt.Println("CHECK PATH +++++++++++++++")
+	if piece.Name != "knight" {
+		spacesMoved := Position{ move.LandingPosition.X - move.StartingPosition.X, move.LandingPosition.Y - move.StartingPosition.Y }
+		currentSquare := move.StartingPosition
+		for currentSquare != move.LandingPosition{
+			if ( spacesMoved.X > 0 ) {
+				currentSquare.X++
+			} else if spacesMoved.X < 0 {
+				currentSquare.X--
 			}
-			if ( spacesMoved.y > 0){
-				currentSquare.y++
-			} else if spacesMoved.y < 0 {
-				currentSquare.y--
+			if ( spacesMoved.Y > 0){
+				currentSquare.Y++
+			} else if spacesMoved.Y < 0 {
+				currentSquare.Y--
 			}
-			if c.squares[currentSquare].gamePiece.player == c.playerTurn {
+			if c.squares[currentSquare].gamePiece.Player == c.playerTurn {
 				return false
 			}
 		}
@@ -164,15 +168,15 @@ func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
 	return true
 }
 
-func (c *ChessPlay) checkValidLanding(piece *GamePiece, landingPosition Position) bool{
-	landingPositionPiecePlayer := c.squares[landingPosition].gamePiece.player
-	if piece.player == landingPositionPiecePlayer {
+func (c *ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position) bool{
+	LandingPositionPiecePlayer := c.squares[LandingPosition].gamePiece.Player
+	if piece.Player == LandingPositionPiecePlayer {
 		fmt.Println("landing on owned piece")
 		return false
-	} else if piece.player != landingPositionPiecePlayer && landingPositionPiecePlayer.name != "" {
-		capturedPiece := c.squares[landingPosition].gamePiece
-		if capturedPiece.name == "king"{
-			c.winner = piece.player
+	} else if piece.Player != LandingPositionPiecePlayer && LandingPositionPiecePlayer.Team != 0 {
+		capturedPiece := c.squares[LandingPosition].gamePiece
+		if capturedPiece.Name == "king"{
+			c.winner = piece.Player
 		}
 		fmt.Println("\nCaptured ", capturedPiece)
 		fmt.Println("")
@@ -182,12 +186,13 @@ func (c *ChessPlay) checkValidLanding(piece *GamePiece, landingPosition Position
 }
 
 func (c *ChessPlay) acceptMove(move Move){
-	piece := c.squares[move.startingPosition].gamePiece
-	piece.moved = true
-	c.squares[move.startingPosition] = Square{}
-	newSquare := c.squares[move.endingPosition] 
+	fmt.Println("ACCEPTING ==================")
+	piece := c.squares[move.StartingPosition].gamePiece
+	piece.Moved = true
+	c.squares[move.StartingPosition] = Square{}
+	newSquare := c.squares[move.LandingPosition] 
 	newSquare.gamePiece = piece
-	c.squares[move.endingPosition] = newSquare
+	c.squares[move.LandingPosition] = newSquare
 }
 
 func (c *ChessPlay) moveTurn(){
@@ -197,8 +202,6 @@ func (c *ChessPlay) moveTurn(){
 		c.playerTurn = c.player1
 	}
 }
-
-func (c ChessPlay) checkLanding(){}
 
 func getAbsolute(number int) int{
 	if number >= 0{

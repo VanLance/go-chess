@@ -8,168 +8,137 @@ type Condition struct{
 }
 
 type MovementType struct{
-	x int
-	y int
-	condition Condition
+	X int
+	Y int
+	Condition
 }
 
 type GamePiece struct{
-	name string
-	player Player
+	Name string
+	Player
 	distance bool
-	movementTypes []MovementType
+	MovementTypes []MovementType
 	back bool
-	moved bool
+	Moved bool
 	capturing bool
+	Position
 }
 
 func (p *GamePiece) addPlayer(position Position){
-	if position.y == 1 || position.y == 2{
-		p.player.name = "1"
+	if position.Y == 1 || position.Y == 2{
+		p.Player.Team = 1
 		} else {
-			p.player.name = "2"
+			p.Player.Team = 2
 		}
 }
 
 var pawn = GamePiece{
-	name: "pawn",
-	movementTypes: []MovementType{
+	Name: "pawn",
+	MovementTypes: []MovementType{
 		{
-			x:0,
-			y:1,
-			condition: Condition{name:"capture", active: false},
+			X:0,
+			Y:1,
+			Condition: Condition{name:"capture", active: false},
 		},
 		{
-			x:0,
-			y:2,
-			condition: Condition{name:"moved", active: false},
+			X:0,
+			Y:2,
+			Condition: Condition{name:"moved", active: false},
 		},
 		{
-			x:1,
-			y:1,
-			condition: Condition{name:"capture", active: true},
+			X:1,
+			Y:1,
+			Condition: Condition{name:"capture", active: true},
 		},
 	},
 	distance: false,
 	back: false,
 }
 var rook = GamePiece{
-	name: "rook",
-	movementTypes: []MovementType{
+	Name: "rook",
+	MovementTypes: []MovementType{
 		{
-			x:0,
-			y:1,
+			X:0,
+			Y:1,
 		},
 		{
-			x:1,
-			y:0,
+			X:1,
+			Y:0,
 		},
 	},
 	distance: true,
 	back: true,
 }
 var bishop = GamePiece{
-	name: "bishop",
-	movementTypes: []MovementType{
+	Name: "bishop",
+	MovementTypes: []MovementType{
 		{
-			x:1,
-			y:1,
+			X:1,
+			Y:1,
 		},
 	},
 	back: true,
 	distance: true,
 }
 var queen = GamePiece{
-	name: "queen",
-	movementTypes: []MovementType{
+	Name: "queen",
+	MovementTypes: []MovementType{
 		{
-			x:1,
-			y:1,
+			X:1,
+			Y:1,
 		},
 		{
-			x:1,
-			y:1,
+			X:1,
+			Y:1,
 		},
 		{
-			x:0,
-			y:1,
+			X:0,
+			Y:1,
 		},
 		{
-			x:1,
-			y:0,
+			X:1,
+			Y:0,
 		},
 	},
 	distance: true,
 	back: true,
 }
 var king = GamePiece{
-	name: "king",
-	movementTypes: []MovementType{
+	Name: "king",
+	MovementTypes: []MovementType{
 		{
-			x:1,
-			y:1,
+			X:1,
+			Y:1,
 		},
 		{
-			x:1,
-			y:1,
+			X:1,
+			Y:1,
 		},
 		{
-			x:0,
-			y:1,
+			X:0,
+			Y:1,
 		},
 		{
-			x:1,
-			y:0,
+			X:1,
+			Y:0,
 		},
 	},
 	distance: false,
 	back: true,
 }
 var knight = GamePiece{
-	name: "knight",
-	movementTypes: []MovementType{
+	Name: "knight",
+	MovementTypes: []MovementType{
 		{
-			x:2,
-			y:1,
+			X:2,
+			Y:1,
 		},
 		{
-			x:1,
-			y:2,
+			X:1,
+			Y:2,
 		},
 	},
 	distance: false,
 	back: true,
 }
 
-// func createPieces()(pieces []GamePiece){
-// 	var pawn = GamePiece{
-// 		name: "pawn",
-// 		captured: false,
-// 		Movement: Movement{},
-// 	}
-// 	var rook = GamePiece{
-// 		name: "rook",
-// 		captured: false,
-// 		Movement: Movement{},
-// 	}
-// 	var bishop = GamePiece{
-// 		name: "bishop",
-// 		captured: false,
-// 		Movement: Movement{},
-// 	}
-// 	var queen = GamePiece{
-// 		name: "queen",
-// 		captured: false,
-// 		Movement: Movement{},
-// 	}
-// 	var king = GamePiece{
-// 		name: "king",
-// 		captured: false,
-// 		Movement: Movement{},
-// 	}
-// 	pieces = append(pieces, rook, bishop, queen, king, rook, bishop)
-// 	for num := 0; num < 8; num++ {
-// 		pieces = append(pieces,pawn)
-// 	}
-// 	return pieces
-// }

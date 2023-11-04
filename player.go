@@ -8,7 +8,8 @@ import (
 
 
 type Player struct {
-	name string
+	Username string
+	Team int
 }
 
 func getUserInput(prompt string) string {
@@ -18,14 +19,14 @@ func getUserInput(prompt string) string {
 	return i
 }
 
-func (p Player) selectMove(startingPosition, landingPosition Position) Move{
-	return Move{startingPosition: startingPosition, endingPosition: landingPosition, player: p}
+func (p Player) selectMove(StartingPosition, LandingPosition Position) Move{
+	return Move{StartingPosition: StartingPosition, LandingPosition: LandingPosition, player: p}
 }
-func (p Player) selectMoveWithString(startingPosition, landingPosition string) Move{
-	startingXInt := convertFirstCharacterToInt(startingPosition[0])
-	startingYInt, _ := strconv.Atoi(string(startingPosition[1]))
-	endingXInt := convertFirstCharacterToInt(landingPosition[0])
-	endingYInt, _ := strconv.Atoi(string(landingPosition[1]))
+func (p Player) selectMoveWithString(StartingPosition, LandingPosition string) Move{
+	startingXInt := convertFirstCharacterToInt(StartingPosition[0])
+	startingYInt, _ := strconv.Atoi(string(StartingPosition[1]))
+	endingXInt := convertFirstCharacterToInt(LandingPosition[0])
+	endingYInt, _ := strconv.Atoi(string(LandingPosition[1]))
 	return p.selectMove(Position{int(startingXInt),startingYInt}, Position{endingXInt,endingYInt})
 }
 

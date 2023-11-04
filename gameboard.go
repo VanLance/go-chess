@@ -7,8 +7,8 @@ import (
 )
 
 type Position struct{
-	x int
-	y int
+	X int
+	Y int
 }
 
 type Square struct{
@@ -29,24 +29,24 @@ func (g *GameBoard) addSquares() {
 	g.squares= make(map[Position]Square)
 	for numX := 1; numX <= 8; numX++ {
 		for numY := 1; numY <= 8; numY++ {
-			g.squares[Position{x:numX, y:numY}] = Square{}
+			g.squares[Position{X:numX, Y:numY}] = Square{}
 		}
 	}
 }
 
 func (g *GameBoard) addPawns() {
 	for numX := 1; numX <= 8; numX++ {
-		square1 := g.squares[Position{x:numX, y:2}]
-		square2 := g.squares[Position{x:numX, y:7}]
+		square1 := g.squares[Position{X:numX, Y:2}]
+		square2 := g.squares[Position{X:numX, Y:7}]
 		pawn1 := pawn
-		pawn1.addPlayer(Position{x:numX, y:2})
+		pawn1.addPlayer(Position{X:numX, Y:2})
 		pawn2 := pawn
-		pawn2.addPlayer(Position{x:numX, y:7})
+		pawn2.addPlayer(Position{X:numX, Y:7})
 		square1.addGamePiece(pawn1)
 		square2.addGamePiece(pawn2)
 		
-		g.squares[Position{x:numX, y:2}] = square1
-		g.squares[Position{x:numX, y:7}] = square2
+		g.squares[Position{X:numX, Y:2}] = square1
+		g.squares[Position{X:numX, Y:7}] = square2
 	}
 }
 
@@ -62,36 +62,36 @@ func (g *GameBoard) addPieces(piecePositions []Position, piece GamePiece) {
 
 func (g *GameBoard) addRooks() {
 	rookPostions := []Position{
-		{x:1,y:1},
-		{x:8,y:1},
-		{x:8,y:1}, 
-		{x:8,y:1}, 
-		{x:1,y:8},
-		{x:8,y:8}}
+		{X:1,Y:1},
+		{X:8,Y:1},
+		{X:8,Y:1}, 
+		{X:8,Y:1}, 
+		{X:1,Y:8},
+		{X:8,Y:8}}
 	g.addPieces(rookPostions, rook)
 	
 }
 
 func (g *GameBoard) addKnights() {
-	knightPostions := []Position{{x:2 ,y: 1},{x:7 ,y:1},{x:2 ,y: 8},{x:7 ,y:8 }}
+	knightPostions := []Position{{X:2 ,Y: 1},{X:7 ,Y:1},{X:2 ,Y: 8},{X:7 ,Y:8 }}
 	g.addPieces(knightPostions, knight)
 	
 }
 
 func (g *GameBoard) addBishops() {
-	bishopPositions := []Position{{x:3,y:1},{x:6, y:1 },{x:3,y:8},{x:6 ,y:8 }}
+	bishopPositions := []Position{{X:3,Y:1},{X:6, Y:1 },{X:3,Y:8},{X:6 ,Y:8 }}
 	g.addPieces(bishopPositions,bishop )
 	
 }
 
 func (g *GameBoard) addKings() {
-	kingPositions := []Position{{x:5,y:1},{x:5,y:8}}
+	kingPositions := []Position{{X:5,Y:1},{X:5,Y:8}}
 	g.addPieces(kingPositions, king)
 	
 }
 
 func (g *GameBoard) addQueens() {
-	queenPositions := []Position{{x:4,y:1},{x:4,y:8}}
+	queenPositions := []Position{{X:4,Y:1},{X:4,Y:8}}
 	g.addPieces(queenPositions, queen)
 	
 }
@@ -115,9 +115,9 @@ func (g GameBoard) displayBoard(){
 		var row []string
 		row = append(row, strconv.Itoa(numberY),"|")
 		for numberX:= 1; numberX <= 8; numberX++{
-			piece := g.squares[Position{x:numberX,y: numberY}].gamePiece
-			pieceName := evenCells(piece.name)
-			row = append(row, pieceName,piece.player.name, "|")
+			piece := g.squares[Position{X:numberX,Y: numberY}].gamePiece
+			pieceName := evenCells(piece.Name)
+			row = append(row, pieceName,piece.Player.Username, "|")
 		}
 		row = append(row, strconv.Itoa(numberY))
 		fmt.Println(row)
