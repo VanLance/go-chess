@@ -1,6 +1,8 @@
 let pieces
 
 
+console.log("TEST")
+
 const testApi = async () => {
   const res = await fetch("http://localhost:8080/")
 

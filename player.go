@@ -20,11 +20,14 @@ func getUserInput(prompt string) string {
 }
 
 func (p Player) selectMove(StartingPosition, LandingPosition Position) Move{
+	fmt.Println("made it to SM")
 	return Move{StartingPosition: StartingPosition, LandingPosition: LandingPosition, player: p}
 }
 func (p Player) selectMoveWithString(StartingPosition, LandingPosition string) Move{
+	fmt.Println("attempting select")
 	startingXInt := convertFirstCharacterToInt(StartingPosition[0])
 	startingYInt, _ := strconv.Atoi(string(StartingPosition[1]))
+	fmt.Println("attempting select after strconv")
 	endingXInt := convertFirstCharacterToInt(LandingPosition[0])
 	endingYInt, _ := strconv.Atoi(string(LandingPosition[1]))
 	return p.selectMove(Position{int(startingXInt),startingYInt}, Position{endingXInt,endingYInt})
