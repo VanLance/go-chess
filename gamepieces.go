@@ -16,9 +16,9 @@ type MovementType struct{
 type GamePiece struct{
 	Name string
 	Player
-	distance bool
+	Distance bool
 	MovementTypes []MovementType
-	back bool
+	Back bool
 	Moved bool
 	capturing bool
 	Position
@@ -30,6 +30,88 @@ func (p *GamePiece) addPlayer(position Position){
 		} else {
 			p.Player.Team = 2
 		}
+}
+
+var MovementTypes = map[string][]MovementType{
+	"pawn" : {
+		{
+			X:0,
+			Y:1,
+			Condition: Condition{name:"capture", active: false},
+		},
+		{
+			X:0,
+			Y:2,
+			Condition: Condition{name:"moved", active: false},
+		},
+		{
+			X:1,
+			Y:1,
+			Condition: Condition{name:"capture", active: true},
+		},
+	},
+	"rook": {
+		{
+			X:0,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:0,
+		},
+	},
+	"bishop": {
+		{
+			X:1,
+			Y:1,
+		},
+	},
+	"queen": {
+		{
+			X:1,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:1,
+		},
+		{
+			X:0,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:0,
+		},
+	},
+	"king": {
+		{
+			X:1,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:1,
+		},
+		{
+			X:0,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:0,
+		},
+	},
+	"knight" : {
+		{
+			X:2,
+			Y:1,
+		},
+		{
+			X:1,
+			Y:2,
+		},
+	},
 }
 
 var pawn = GamePiece{
@@ -51,8 +133,8 @@ var pawn = GamePiece{
 			Condition: Condition{name:"capture", active: true},
 		},
 	},
-	distance: false,
-	back: false,
+	Distance: false,
+	Back: false,
 }
 var rook = GamePiece{
 	Name: "rook",
@@ -66,8 +148,8 @@ var rook = GamePiece{
 			Y:0,
 		},
 	},
-	distance: true,
-	back: true,
+	Distance: true,
+	Back: true,
 }
 var bishop = GamePiece{
 	Name: "bishop",
@@ -77,8 +159,8 @@ var bishop = GamePiece{
 			Y:1,
 		},
 	},
-	back: true,
-	distance: true,
+	Back: true,
+	Distance: true,
 }
 var queen = GamePiece{
 	Name: "queen",
@@ -100,8 +182,8 @@ var queen = GamePiece{
 			Y:0,
 		},
 	},
-	distance: true,
-	back: true,
+	Distance: true,
+	Back: true,
 }
 var king = GamePiece{
 	Name: "king",
@@ -123,8 +205,8 @@ var king = GamePiece{
 			Y:0,
 		},
 	},
-	distance: false,
-	back: true,
+	Distance: false,
+	Back: true,
 }
 var knight = GamePiece{
 	Name: "knight",
@@ -138,7 +220,7 @@ var knight = GamePiece{
 			Y:2,
 		},
 	},
-	distance: false,
-	back: true,
+	Distance: false,
+	Back: true,
 }
 

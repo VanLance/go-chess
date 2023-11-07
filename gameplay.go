@@ -84,7 +84,7 @@ func (c ChessPlay) getPiece(position Position) GamePiece{
 }
 
 func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
-	if piece.back == false {
+	if piece.Back == false {
 		if c.playerTurn == c.player1{
 			return move.StartingPosition.Y < move.LandingPosition.Y
 		} else {
@@ -95,37 +95,40 @@ func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 }
 
 func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
-	fmt.Println("CHECK MOVE +++++++++++++++ FIX")
 	spacesMoved := Position{getAbsolute(move.LandingPosition.X - move.StartingPosition.X), getAbsolute(move.LandingPosition.Y - move.StartingPosition.Y)}
+	fmt.Println("SPACEDM MOCED", spacesMoved)
 	checkCondition := false
 	checkMove := MovementType{} 
 	if c.checkDirection(piece, move){
-		for _, validMove := range piece.MovementTypes {
+		for _, validMove := range MovementTypes[piece.Name] {
 			if spacesMoved.X == validMove.X && spacesMoved.Y == validMove.Y{
+
+				fmt.Println(validMove, "MOVE!!!!!!!!!!!")
+				fmt.Println("CORRECT SPOT !!!!!!!")
+				fmt.Println(validMove.Condition.name)
 				if validMove.Condition.name != "" {
 					checkCondition = true
 					checkMove = validMove
 				}
 				isValidMove = true
-			}
-			if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
+			} else if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
 				if ( validMove.X != 0 ) && ( validMove.Y != 0) {
-					if spacesMoved.X / validMove.Y == spacesMoved.Y / validMove.Y && piece.distance == true{
+					if spacesMoved.X / validMove.Y == spacesMoved.Y / validMove.Y && piece.Distance == true{
 						isValidMove = true
 					}
 				}
-				} else if spacesMoved.X != 0 {
-					if validMove.X == 1 && validMove.Y == 0 && piece.distance == true{
-						isValidMove = true
-					}
-					} else {
-						if validMove.X == 1 && validMove.Y == 0 && piece.distance == true {
-							isValidMove = true
+			} else if spacesMoved.X != 0 {
+				if validMove.X == 1 && validMove.Y == 0 && piece.Distance == true{
+					isValidMove = true
+				}
+			} else {
+				if validMove.X == 1 && validMove.Y == 0 && piece.Distance == true {
+					isValidMove = true
 				}
 			} 
 		}
 	}
-	
+	fmt.Println(checkCondition, "CHECK CONDITION !!!!!!!!!")
 	if checkCondition && !c.checkCondition(piece, checkMove){
 		isValidMove = false
 	}
@@ -144,7 +147,6 @@ func (c ChessPlay) checkCondition(piece GamePiece, move MovementType) bool{
 }
 
 func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
-	fmt.Println("CHECK PATH +++++++++++++++")
 	if piece.Name != "knight" {
 		spacesMoved := Position{ move.LandingPosition.X - move.StartingPosition.X, move.LandingPosition.Y - move.StartingPosition.Y }
 		currentSquare := move.StartingPosition
@@ -186,9 +188,10 @@ func (c *ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position
 }
 
 func (c *ChessPlay) acceptMove(move Move){
-	fmt.Println("ACCEPTING ==================")
 	piece := c.squares[move.StartingPosition].gamePiece
+	fmt.Println(piece.capturing)
 	piece.Moved = true
+	piece.capturing = false
 	c.squares[move.StartingPosition] = Square{}
 	newSquare := c.squares[move.LandingPosition] 
 	newSquare.gamePiece = piece

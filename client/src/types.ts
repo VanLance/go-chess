@@ -3,6 +3,12 @@ type Player = {
   Team: number
 }
 
+type ChessState = {
+  move?: Move
+  playerTurn: Player
+  pieces: Array<Piece>
+}
+
 type Piece = Position & {
   Name: string
   Username?: string
@@ -26,7 +32,7 @@ type Condition = {
 type Move = {
   startingPosition: Position
   landingPosition: Position
-  playerTurn: Player
+  playerTurn?: Player
 }
 
 type ChessColumn = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H"
@@ -38,5 +44,6 @@ export {
   Movement,
   Condition,
   ChessColumn,
-  Move
+  Move,
+  ChessState
 }

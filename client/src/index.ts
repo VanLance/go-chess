@@ -1,66 +1,71 @@
 import { addPieces, clearPieces, createChessSquares } from './chessSquares'
-import { Move, Piece, Player } from './types'
+import { ChessState } from './types'
 
+let chessState: ChessState
 
-let playerTurn: Player
-console.log("TEST")
 
 createChessSquares()
 
-async function testApi(){
+async function getStartingPieces(){
   const res = await fetch("http://localhost:8080/")
 
   const data = await res.json()
-  playerTurn = data.PlayerTurn
+  chessState = {
+    playerTurn: data.PlayerTurn,
+    pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
+  }
+  console.log(chessState, 'getStarted')
   clearPieces()
-  addPieces(data.PlayerOnePieces)
-  addPieces(data.PlayerTwoPieces)
+  addPieces(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
+  console.log(chessState.playerTurn, 'getStarted')
   return data
 }
 
 
-
-
-async function makeMove(pieces: Array<Piece>, move: Move) {
-  // const pieces = await testApi()
+async function makeMove() {
+  console.log(chessState, 'MAKE MOVE')
   const res = await fetch("http://localhost:8080/make-move", {
     method: "POST",
     headers: {
       "Content-Type": 'application/json'
     },
     body: JSON.stringify({
-      previousState: pieces,
+      previousState: chessState.pieces,
       move : {
-        startingPosition: move.startingPosition.X + move.startingPosition.Y.toString(),
-        landingPosition: move.landingPosition.X + move.landingPosition.Y.toString(),
-        player: 1
+        startingPosition: chessState.move!.startingPosition.X + chessState.move!.startingPosition.Y.toString(),
+        landingPosition: chessState.move!.landingPosition.X + chessState.move!.landingPosition.Y.toString(),
+        player: chessState.playerTurn
       }
     })
   })
   if (res.ok) {
     const data = await res.json();
-    playerTurn = data.PlayerTurn
-    clearPieces()
-    addPieces(data.PlayerOnePieces)
-    addPieces(data.PlayerTwoPieces)
-    pieces.length = 0
-    pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
+    console.log(data.PlayerTurn, "DATA FROM MOVE 2!!!!!!!!!")
+    udpateData(data)
+    console.log(data.PlayerTurn, "DATA FROM MOVE 2 2")
     console.log("Response Data:", data);
+    // chessState.playerTurn = data.PlayerTurn
+    // console.log(chessState, 'When it matters Make Moves')
     return data
   } else {
     console.error('HTTP error:', res.status);
   }
 };
 
+function udpateData(data : any){
+    chessState.playerTurn = data.PlayerTurn
+    chessState.pieces = []
+    chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
+    console.log(chessState, 'Wen it matters')
+    clearPieces()
+    addPieces(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
+}
 
-(async () => { (await testApi()) })()
+(async () => { (await getStartingPieces()) })()
 
-const data = await testApi()
-console.log(data, "DATA===================")
-const pieces = [...data.PlayerOnePieces, ...data.PlayerTwoPieces]
+
 
 export {
   makeMove,
-  playerTurn,
-  pieces
+  chessState,
 }

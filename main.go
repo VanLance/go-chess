@@ -22,12 +22,13 @@ type MoveReq struct {
 type ClientMove struct {
 	StartingPosition string `json:"startingPosition"`
 	LandingPosition string `json:"landingPosition"`
-	Player int `json:"player"`
+	Player `json:"player"`
 }
 
 
 func handleStart(w http.ResponseWriter, r *http.Request) {
 	chess := createChess()
+	chess.playerTurn = chess.player1
 	jsonRes := createBoardRes(chess)
 	w.Header().Set("Content-Type","application/json")
 	res, err := json.Marshal(jsonRes)
@@ -52,7 +53,7 @@ func createBoardRes(chess ChessPlay) JSONRes{
 			}
 		}
 	}
-	return JSONRes{PlayerOnePieces: playerOnePieces, PlayerTwoPieces: playerTwoPieces, PlayerTurn: chess.player1, Message: "Starting Pieces" }
+	return JSONRes{PlayerOnePieces: playerOnePieces, PlayerTwoPieces: playerTwoPieces, PlayerTurn: chess.playerTurn, Message: "Starting Pieces" }
 }
 
 func handleMove(w http.ResponseWriter, r *http.Request){
@@ -65,12 +66,11 @@ func handleMove(w http.ResponseWriter, r *http.Request){
 	fmt.Printf("Received data: %+v\n", m)
 	
 	fmt.Printf("StartingPosition: %s, LandingPosition: %s, PlayerTurn: %+v\n", m.ClientMove.StartingPosition, m.ClientMove.LandingPosition, m.Player)
-	chess := recreateBoard(m.PreviousState)
+	chess := recreateBoard(m.PreviousState, m.Player)
 
 	move := chess.playerTurn.selectMoveWithString(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition)
 	chess.makeMove(move)
 	chess.displayBoard()
-	
 	jsonRes := createBoardRes(chess)
 	w.Header().Set("Content-Type","application/json")
 	res, err := json.Marshal(jsonRes)
@@ -98,13 +98,12 @@ func main() {
 	}
 }
 
-func recreateBoard(pieces []GamePiece) ChessPlay{
+func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
+	fmt.Println(player, "FROM RECREATE")
 	chess :=  ChessPlay{GameBoard: GameBoard{}, player1:Player{Team:1}, player2: Player{Team:2} }
 	chess.addSquares()
-	fmt.Println(chess.GameBoard.squares, "====================================")
-	chess.playerTurn = chess.player1
+	chess.playerTurn = player
 	for _, piece := range pieces {
-		fmt.Println(piece)
 		square := chess.GameBoard.squares[piece.Position]
 		square.gamePiece = piece
 		chess.GameBoard.squares[piece.Position] = square
