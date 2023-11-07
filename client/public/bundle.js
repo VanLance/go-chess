@@ -85,9 +85,18 @@ function clearClasses(div) {
         }
     }
 }
+function clearActiveSquare() {
+    const playerDivs = document.querySelectorAll(`.player-${_index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team}`);
+    for (const e of playerDivs) {
+        if (e.classList.contains('selected-square')) {
+            e.classList.remove('selected-square');
+        }
+    }
+}
 function getMove(player, div) {
     const squarePlayer = getPlayerFromDiv(div.classList);
     if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1]) {
+        clearActiveSquare();
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = { startingPosition: getPositionFromDivId(div.id), landingPosition: { X: 0, Y: 0 } };
         div.classList.add('selected-square');
     }

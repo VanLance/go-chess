@@ -75,9 +75,19 @@ function clearClasses(div: Element) {
   }
 }
 
+function clearActiveSquare(){
+  const playerDivs = document.querySelectorAll(`.player-${chessState.playerTurn.Team}`)
+  for(const e of playerDivs){
+    if (e.classList.contains('selected-square')){
+      e.classList.remove('selected-square')
+    }
+  }
+}
+
 function getMove(player: Player, div: HTMLDivElement) {
   const squarePlayer = getPlayerFromDiv(div.classList);
   if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1]) {
+    clearActiveSquare()
     chessState.move = {startingPosition : getPositionFromDivId(div.id), landingPosition : {X:0,Y:0}};
     div.classList.add('selected-square');
   } else if (chessState.move?.startingPosition.X && chessState.move.startingPosition.Y) {

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	// "fmt"
 )
 
 type Position struct{
