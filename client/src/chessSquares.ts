@@ -14,7 +14,7 @@ const xNumbers: { [key: number]: string } = {
 
 function createChessSquares() {
   for (let number = 9; number >= 0; number--) {
-    for (const letter of '0ABCDEFGH0') {
+    for (const letter of ' ABCDEFGH1') {
       const div = createChessDiv(number, letter);
       addChessSquare(div);
     }
@@ -24,10 +24,20 @@ function createChessSquares() {
 function createChessDiv(number: number, letter: string): HTMLDivElement {
   const div = document.createElement('div');
   div.id = `${letter}${number}`;
-  if (number === 0 || number === 9) {
-    div.innerText = letter;
-  } else if (letter === '0') {
-    div.innerText = number.toString();
+  if ((number === 0 || number === 9 ) && letter != ' ' && letter != '1') {
+    if (letter != ' ' && letter != '1'){
+      div.innerText = letter;}
+  } else if (letter === ' ' || letter === '1') {
+    if (number != 9 && number != 0 ){ 
+      div.innerText = number.toString();
+    }
+    if (letter === ' ' || letter === '1' ){
+      div.classList.add('border-number')
+    }
+    if (letter === ' '){
+      
+      div.classList.add('left-border')
+    }
   } else {
     div.classList.add('chess-square');
   }
@@ -49,11 +59,10 @@ function addPieces(...pieces: Array<Piece>) {
     ) as HTMLDivElement;
     square.classList.add(`player-${piece.Team}`);
     square.classList.add(`${piece.Name}`);
-    if (square) {
-      const p = document.createElement('p');
-      p.innerText = piece.Name + '\n' + piece.Team;
-      square.appendChild(p);
-    }
+    const img = document.createElement('img');
+    console.log(`./static/images/${piece.Name}-${piece.Team == 1? "white":"black"}`)
+    img.src = `./static/images/${piece.Name}-${piece.Team == 1? "white":"black"}.png`
+    square.appendChild(img);
   }
 }
 
@@ -76,12 +85,8 @@ function clearClasses(div: Element) {
 }
 
 function clearActiveSquare(){
-  const playerDivs = document.querySelectorAll(`.player-${chessState.playerTurn.Team}`)
-  for(const e of playerDivs){
-    if (e.classList.contains('selected-square')){
-      e.classList.remove('selected-square')
-    }
-  }
+  const activeSquare = document.querySelector(`.selected-square`)
+  activeSquare?.classList.toggle('selected-square')
 }
 
 function getMove(player: Player, div: HTMLDivElement) {

@@ -30,7 +30,7 @@ const xNumbers = {
 };
 function createChessSquares() {
     for (let number = 9; number >= 0; number--) {
-        for (const letter of '0ABCDEFGH0') {
+        for (const letter of ' ABCDEFGH1') {
             const div = createChessDiv(number, letter);
             addChessSquare(div);
         }
@@ -39,11 +39,21 @@ function createChessSquares() {
 function createChessDiv(number, letter) {
     const div = document.createElement('div');
     div.id = `${letter}${number}`;
-    if (number === 0 || number === 9) {
-        div.innerText = letter;
+    if ((number === 0 || number === 9) && letter != ' ' && letter != '1') {
+        if (letter != ' ' && letter != '1') {
+            div.innerText = letter;
+        }
     }
-    else if (letter === '0') {
-        div.innerText = number.toString();
+    else if (letter === ' ' || letter === '1') {
+        if (number != 9 && number != 0) {
+            div.innerText = number.toString();
+        }
+        if (letter === ' ' || letter === '1') {
+            div.classList.add('border-number');
+        }
+        if (letter === ' ') {
+            div.classList.add('left-border');
+        }
     }
     else {
         div.classList.add('chess-square');
@@ -62,11 +72,10 @@ function addPieces(...pieces) {
         const square = document.querySelector(`#${xNumbers[piece.X]}${piece.Y}`);
         square.classList.add(`player-${piece.Team}`);
         square.classList.add(`${piece.Name}`);
-        if (square) {
-            const p = document.createElement('p');
-            p.innerText = piece.Name + '\n' + piece.Team;
-            square.appendChild(p);
-        }
+        const img = document.createElement('img');
+        console.log(`./static/images/${piece.Name}-${piece.Team == 1 ? "white" : "black"}`);
+        img.src = `./static/images/${piece.Name}-${piece.Team == 1 ? "white" : "black"}.png`;
+        square.appendChild(img);
     }
 }
 function clearPieces() {
@@ -86,12 +95,8 @@ function clearClasses(div) {
     }
 }
 function clearActiveSquare() {
-    const playerDivs = document.querySelectorAll(`.player-${_index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team}`);
-    for (const e of playerDivs) {
-        if (e.classList.contains('selected-square')) {
-            e.classList.remove('selected-square');
-        }
-    }
+    const activeSquare = document.querySelector(`.selected-square`);
+    activeSquare?.classList.toggle('selected-square');
 }
 function getMove(player, div) {
     const squarePlayer = getPlayerFromDiv(div.classList);
@@ -149,14 +154,10 @@ async function getStartingPieces() {
         playerTurn: data.PlayerTurn,
         pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
     };
-    console.log(chessState, 'getStarted');
-    (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.clearPieces)();
-    (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.addPieces)(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
-    console.log(chessState.playerTurn, 'getStarted');
+    updateChessState(data);
     return data;
 }
 async function makeMove() {
-    console.log(chessState, 'MAKE MOVE');
     const res = await fetch("http://localhost:8080/make-move", {
         method: "POST",
         headers: {
@@ -173,12 +174,8 @@ async function makeMove() {
     });
     if (res.ok) {
         const data = await res.json();
-        console.log(data.PlayerTurn, "DATA FROM MOVE 2!!!!!!!!!");
-        udpateData(data);
-        console.log(data.PlayerTurn, "DATA FROM MOVE 2 2");
+        updateChessState(data);
         console.log("Response Data:", data);
-        // chessState.playerTurn = data.PlayerTurn
-        // console.log(chessState, 'When it matters Make Moves')
         return data;
     }
     else {
@@ -186,13 +183,17 @@ async function makeMove() {
     }
 }
 ;
-function udpateData(data) {
+function updateChessState(data) {
     chessState.playerTurn = data.PlayerTurn;
     chessState.pieces = [];
     chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
-    console.log(chessState, 'Wen it matters');
+    updatePlayerTurn();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.clearPieces)();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.addPieces)(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
+}
+function updatePlayerTurn() {
+    let playerTurnP = document.getElementById('player-turn');
+    playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
 (async () => { (await getStartingPieces()); })();
 
