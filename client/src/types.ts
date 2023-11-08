@@ -13,8 +13,6 @@ type Piece = Position & {
   Name: string
   Username?: string
   Team: number
-  MovementTypes: Array<Movement>
-  
 }
 
 type Position = {

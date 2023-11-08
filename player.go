@@ -20,7 +20,6 @@ func getUserInput(prompt string) string {
 }
 
 func (p Player) selectMove(StartingPosition, LandingPosition Position) Move{
-	fmt.Println("made it to SM")
 	return Move{StartingPosition: StartingPosition, LandingPosition: LandingPosition, player: p}
 }
 func (p Player) selectMoveWithString(StartingPosition, LandingPosition string) Move{

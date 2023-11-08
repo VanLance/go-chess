@@ -89,13 +89,26 @@ function clearActiveSquare(){
   activeSquare?.classList.toggle('selected-square')
 }
 
+function checkCastle(player: Player, div: HTMLDivElement){
+  if ( player.Team == 1 && div.id == 'E1'){
+    if (chessState.move?.startingPosition.Y === 1 && (chessState.move?.startingPosition.X === 'A' || chessState.move?.startingPosition.X === 'H') ){
+      return true
+    }
+  } else if (player.Team == 2 && div.id == 'E8') {
+    if(chessState.move?.startingPosition.Y === 8 && (chessState.move?.startingPosition.X === 'A' || chessState.move?.startingPosition.X === 'H') ){
+      return true
+    }
+  }
+}
+
+
 function getMove(player: Player, div: HTMLDivElement) {
   const squarePlayer = getPlayerFromDiv(div.classList);
-  if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1]) {
+  if ( player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] && !checkCastle(player, div) ) {
     clearActiveSquare()
     chessState.move = {startingPosition : getPositionFromDivId(div.id), landingPosition : {X:0,Y:0}};
     div.classList.add('selected-square');
-  } else if (chessState.move?.startingPosition.X && chessState.move.startingPosition.Y) {
+  } else if (chessState.move) {
     chessState.move.landingPosition = getPositionFromDivId(div.id);
   }
 }

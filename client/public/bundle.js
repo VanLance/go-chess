@@ -98,14 +98,26 @@ function clearActiveSquare() {
     const activeSquare = document.querySelector(`.selected-square`);
     activeSquare?.classList.toggle('selected-square');
 }
+function checkCastle(player, div) {
+    if (player.Team == 1 && div.id == 'E1') {
+        if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.Y === 1 && (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X === 'A' || _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X === 'H')) {
+            return true;
+        }
+    }
+    else if (player.Team == 2 && div.id == 'E8') {
+        if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.Y === 8 && (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X === 'A' || _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X === 'H')) {
+            return true;
+        }
+    }
+}
 function getMove(player, div) {
     const squarePlayer = getPlayerFromDiv(div.classList);
-    if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1]) {
+    if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] && !checkCastle(player, div)) {
         clearActiveSquare();
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = { startingPosition: getPositionFromDivId(div.id), landingPosition: { X: 0, Y: 0 } };
         div.classList.add('selected-square');
     }
-    else if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X && _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.startingPosition.Y) {
+    else if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move) {
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = getPositionFromDivId(div.id);
     }
 }

@@ -17,8 +17,6 @@ type GamePiece struct{
 	Name string
 	Player
 	Distance bool
-	MovementTypes []MovementType
-	Back bool
 	Moved bool
 	capturing bool
 	Position
@@ -116,111 +114,26 @@ var MovementTypes = map[string][]MovementType{
 
 var pawn = GamePiece{
 	Name: "pawn",
-	MovementTypes: []MovementType{
-		{
-			X:0,
-			Y:1,
-			Condition: Condition{name:"capture", active: false},
-		},
-		{
-			X:0,
-			Y:2,
-			Condition: Condition{name:"moved", active: false},
-		},
-		{
-			X:1,
-			Y:1,
-			Condition: Condition{name:"capture", active: true},
-		},
-	},
 	Distance: false,
-	Back: false,
 }
 var rook = GamePiece{
 	Name: "rook",
-	MovementTypes: []MovementType{
-		{
-			X:0,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:0,
-		},
-	},
 	Distance: true,
-	Back: true,
 }
 var bishop = GamePiece{
 	Name: "bishop",
-	MovementTypes: []MovementType{
-		{
-			X:1,
-			Y:1,
-		},
-	},
-	Back: true,
 	Distance: true,
 }
 var queen = GamePiece{
 	Name: "queen",
-	MovementTypes: []MovementType{
-		{
-			X:1,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:1,
-		},
-		{
-			X:0,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:0,
-		},
-	},
 	Distance: true,
-	Back: true,
 }
 var king = GamePiece{
 	Name: "king",
-	MovementTypes: []MovementType{
-		{
-			X:1,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:1,
-		},
-		{
-			X:0,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:0,
-		},
-	},
 	Distance: false,
-	Back: true,
 }
 var knight = GamePiece{
 	Name: "knight",
-	MovementTypes: []MovementType{
-		{
-			X:2,
-			Y:1,
-		},
-		{
-			X:1,
-			Y:2,
-		},
-	},
 	Distance: false,
-	Back: true,
 }
 
