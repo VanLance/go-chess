@@ -119,7 +119,7 @@ function getPosition(player: Player, div: HTMLDivElement) {
     player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
     !checkCastle(player, div)
   ) {
-    // clearActiveSquare();
+    clearActiveSquare();
     chessState.move = {
       startingPosition: getPositionFromDivId(div.id),
       landingPosition: { X: 0, Y: 0 },

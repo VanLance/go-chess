@@ -117,6 +117,7 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 					checkMove = validMove
 				}
 				isValidMove = true
+				c.checkEnPassant(move)
 			} else if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
 				if ( validMove.X != 0 ) && ( validMove.Y != 0) {
 					if spacesMoved.X / validMove.Y == spacesMoved.Y / validMove.Y && piece.Distance == true{
@@ -158,6 +159,9 @@ func (c ChessPlay) checkCondition(piece GamePiece, move MovementType) bool{
 	}
 	if move.Condition.name == "capture" {
 		return piece.capturing == move.Condition.active
+	}
+	if move.Condition.name == "en-passant"{
+
 	}
 	return false
 }
