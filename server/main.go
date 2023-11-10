@@ -44,12 +44,12 @@ func createBoardRes(chess ChessPlay) JSONRes{
 	playerOnePieces := []GamePiece{}
 	playerTwoPieces := []GamePiece{}
 	for position, square := range chess.GameBoard.squares{
-		if square.gamePiece.Name != ""{
-			square.gamePiece.Position = position
-			if square.gamePiece.Team == 1{
-				playerOnePieces = append(playerOnePieces, square.gamePiece)
+		if square.Name != ""{
+			square.Position = position
+			if square.Team == 1{
+				playerOnePieces = append(playerOnePieces, square)
 			} else {
-				playerTwoPieces= append(playerTwoPieces, square.gamePiece)
+				playerTwoPieces= append(playerTwoPieces, square)
 			}
 		}
 	}
@@ -104,7 +104,7 @@ func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
 	chess.playerTurn = player
 	for _, piece := range pieces {
 		square := chess.GameBoard.squares[piece.Position]
-		square.gamePiece = piece
+		square = piece
 		chess.GameBoard.squares[piece.Position] = square
 		if piece.Name == "king"{
 			piece.Player.king = piece.Position

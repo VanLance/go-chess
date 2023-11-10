@@ -62,23 +62,23 @@ func (c *ChessPlay) makeMove(move Move){
 }
 
 func (c ChessPlay) checkPiece(move Move) bool{
-	piecePlayer := c.squares[move.StartingPosition].gamePiece.Player
+	piecePlayer := c.squares[move.StartingPosition].Player
 	return c.playerTurn == move.player && piecePlayer.Team == move.player.Team
 }
 
 func (c ChessPlay) getPiece(position Position) GamePiece{
-	return c.GameBoard.squares[position].gamePiece
+	return c.GameBoard.squares[position]
 }
 
 func (c ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position) bool{
-	LandingPositionPiecePlayer := c.squares[LandingPosition].gamePiece.Player
+	LandingPositionPiecePlayer := c.squares[LandingPosition].Player
 	if piece.Player == LandingPositionPiecePlayer {
-		if (piece.Name != "rook" && c.squares[LandingPosition].gamePiece.Name != "king"){
+		if (piece.Name != "rook" && c.squares[LandingPosition].Name != "king"){
 			fmt.Println("landing on owned piece")
 			return false
 		}
 	} else if piece.Player != LandingPositionPiecePlayer && LandingPositionPiecePlayer.Team != 0 {
-		capturedPiece := c.squares[LandingPosition].gamePiece
+		capturedPiece := c.squares[LandingPosition]
 		if capturedPiece.Name == "king"{
 			c.Winner = piece.Player
 		}
@@ -156,7 +156,7 @@ func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
 		spacesMoved := Position{ move.LandingPosition.X - move.StartingPosition.X, move.LandingPosition.Y - move.StartingPosition.Y }
 		currentSquare := move.StartingPosition
 		for currentSquare != move.LandingPosition{
-			if c.squares[currentSquare].gamePiece.Player == c.playerTurn && currentSquare != move.StartingPosition {
+			if c.squares[currentSquare].Player == c.playerTurn && currentSquare != move.StartingPosition {
 				return false
 			}
 			if ( spacesMoved.X > 0 ) {
@@ -180,12 +180,12 @@ func (c *ChessPlay) acceptMove(move Move){
 		c.castleKing(move)
 		return
 	}
-	piece := c.squares[move.StartingPosition].gamePiece
+	piece := c.squares[move.StartingPosition]
 	piece.Moved = true
 	piece.capturing = false
-	c.squares[move.StartingPosition] = Square{}
+	c.squares[move.StartingPosition] = GamePiece{}
 	newSquare := c.squares[move.LandingPosition] 
-	newSquare.gamePiece = piece
+	newSquare = piece
 	c.squares[move.LandingPosition] = newSquare
 	c.clearEnPassant()
 	c.checkEnPassant(move)

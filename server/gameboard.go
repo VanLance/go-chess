@@ -12,25 +12,21 @@ type Position struct{
 	Y int
 }
 
-type Square struct{
-	gamePiece GamePiece
-}
+
 
 type GameBoard struct{ 
-	squares map[Position]Square
+	squares map[Position]GamePiece
 }
 
 
 
-func (s *Square) addGamePiece(gamepiece GamePiece){
-	s.gamePiece = gamepiece
-}
+
 
 func (g *GameBoard) addSquares() {
-	g.squares= make(map[Position]Square)
+	g.squares= make(map[Position]GamePiece)
 	for numX := 1; numX <= 8; numX++ {
 		for numY := 1; numY <= 8; numY++ {
-			g.squares[Position{X:numX, Y:numY}] = Square{}
+			g.squares[Position{X:numX, Y:numY}] = GamePiece{}
 		}
 	}
 }
@@ -43,8 +39,8 @@ func (g *GameBoard) addPawns() {
 		pawn1.addPlayer(Position{X:numX, Y:2})
 		pawn2 := pawn
 		pawn2.addPlayer(Position{X:numX, Y:7})
-		square1.addGamePiece(pawn1)
-		square2.addGamePiece(pawn2)
+		square1 = pawn1
+		square2 = pawn2 
 		
 		g.squares[Position{X:numX, Y:2}] = square1
 		g.squares[Position{X:numX, Y:7}] = square2
@@ -56,7 +52,7 @@ func (g *GameBoard) addPieces(piecePositions []Position, piece GamePiece) {
 	for _, position := range piecePositions {
 		piece.addPlayer(position)
 			square := g.squares[position]
-			square.gamePiece = piece
+			square = piece
 			g.squares[position] = square
 		}
 	}
@@ -116,7 +112,7 @@ func (g GameBoard) displayBoard(){
 		var row []string
 		row = append(row, strconv.Itoa(numberY),"|")
 		for numberX:= 1; numberX <= 8; numberX++{
-			piece := g.squares[Position{X:numberX,Y: numberY}].gamePiece
+			piece := g.squares[Position{X:numberX,Y: numberY}]
 			pieceName := evenCells(piece.Name)
 			row = append(row, pieceName,piece.Player.Username, "|")
 		}

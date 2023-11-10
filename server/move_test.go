@@ -8,26 +8,26 @@ import (
 
 func TestCapture( t *testing.T){
 	chess := createChess()
-	playerOnePiece := chess.squares[Position{X:1,Y:1}].gamePiece
+	playerOnePiece := chess.squares[Position{X:1,Y:1}]
 	result := chess.checkValidLanding(&playerOnePiece, Position{X:1, Y:7})
 	if !result {
 		t.Errorf("Expect true to own square got %v", result)
 	}
 	if result {
 		chess.acceptMove(Move{Position{X:1, Y:7}, Position{X:1, Y:7},chess.player1})
-		if chess.squares[Position{X:1, Y:7}].gamePiece.Player.Team != 2{
-			t.Errorf("Expect player1 to own square got %v", chess.squares[Position{X:1, Y:7}].gamePiece.Player)
+		if chess.squares[Position{X:1, Y:7}].Player.Team != 2{
+			t.Errorf("Expect player1 to own square got %v", chess.squares[Position{X:1, Y:7}].Player)
 		}
 	}	
-	playerTwoPiece := chess.squares[Position{X:8,Y:8}].gamePiece
+	playerTwoPiece := chess.squares[Position{X:8,Y:8}]
 	result = chess.checkValidLanding(&playerTwoPiece, Position{X:8, Y:2})
 	if !result {
 		t.Errorf("Expect true to own square got %v", result)
 	}
 	if result {
 		chess.acceptMove(Move{Position{X:8,Y:8}, Position{X:8, Y:2} ,chess.player1})
-		if chess.squares[Position{X:8, Y:2}].gamePiece.Player.Team != 2{
-			t.Errorf("Expect player1 to own square got %v", chess.squares[Position{X:8, Y:2}].gamePiece.Player)
+		if chess.squares[Position{X:8, Y:2}].Player.Team != 2{
+			t.Errorf("Expect player1 to own square got %v", chess.squares[Position{X:8, Y:2}].Player)
 		}
 	}	
 }
@@ -36,10 +36,10 @@ func TestCapture( t *testing.T){
 // 	gameBoard := GameBoard{}
 // 	gameBoard.startingBoard()
 // 	chess := ChessPlay{GameBoard: gameBoard, player1:Player{name:"1"}, player2: Player{"2"}}
-// 	playerOnePiece := chess.squares[Position{X:1,Y:1}].gamePiece
+// 	playerOnePiece := chess.squares[Position{X:1,Y:1}]
 // 	result := chess.checkValidLanding(playerOnePiece, Position{X:1,Y:2})
 // 	if result{
-// 		t.Errorf("Expect false Landed on my pawn got %v", chess.squares[Position{X:8, Y:2}].gamePiece.player)
+// 		t.Errorf("Expect false Landed on my pawn got %v", chess.squares[Position{X:8, Y:2}].player)
 // 	}
 // }
 
