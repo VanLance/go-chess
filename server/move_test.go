@@ -66,12 +66,12 @@ func TestPath( t *testing.T){
 func TestMovesCondition( t *testing.T){
 	chess := createChess()
 	pawn := chess.getPiece(Position{1,2})
-	result := chess.checkCondition(pawn, MovementType{X:0,Y:2, Condition: Condition{name:"moved", active: false}})
+	result := chess.checkCondition(pawn, MovementType{X:0,Y:2, conditions: []Condition{{name:"moved", active: false}}}, Position{X:0,Y:4})
 	if !result {
 		t.Errorf("Expect true pawn first move, two paces got %v", result)
 	}
 	pawn.capturing = true
-	result = chess.checkCondition(pawn, MovementType{X:1,Y:1, Condition: Condition{name:"capturing", active: true}})
+	result = chess.checkCondition(pawn, MovementType{X:1,Y:1, conditions: []Condition{{name:"capturing", active: true}}}, Position{X:2,Y:3})
 	if result {
 		t.Errorf("Expect false pawn not capturing, got %v", result)
 	}

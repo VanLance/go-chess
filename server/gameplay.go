@@ -85,9 +85,7 @@ func (c ChessPlay) getPiece(position Position) GamePiece{
 
 func (c *ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position) bool{
 	LandingPositionPiecePlayer := c.squares[LandingPosition].gamePiece.Player
-	fmt.Println(LandingPositionPiecePlayer)
 	if piece.Player == LandingPositionPiecePlayer {
-		fmt.Println(piece.Name, c.squares[LandingPosition].gamePiece.Name, "pieces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		if (piece.Name != "rook" && c.squares[LandingPosition].gamePiece.Name != "king"){
 			fmt.Println("landing on owned piece")
 			return false
@@ -112,12 +110,11 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 	if c.checkDirection(piece, move){
 		for _, validMove := range MovementTypes[piece.Name] {
 			if spacesMoved.X == validMove.X && spacesMoved.Y == validMove.Y{
-				if validMove.Condition.name != "" {
+				if len(validMove.conditions) != 0 {
 					checkCondition = true
 					checkMove = validMove
 				}
 				isValidMove = true
-				c.checkEnPassant(move)
 			} else if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
 				if ( validMove.X != 0 ) && ( validMove.Y != 0) {
 					if spacesMoved.X / validMove.Y == spacesMoved.Y / validMove.Y && piece.Distance == true{
@@ -135,7 +132,7 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 			} 
 		}
 	}
-	if checkCondition && !c.checkCondition(piece, checkMove){
+	if checkCondition && !c.checkCondition(piece, checkMove, move.LandingPosition){
 		isValidMove = false
 	}
 	piece.capturing = false
@@ -153,17 +150,26 @@ func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 	return true
 }
 
-func (c ChessPlay) checkCondition(piece GamePiece, move MovementType) bool{
-	if move.Condition.name == "moved"  {
-		return move.Condition.active == piece.Moved
+func (c ChessPlay) checkCondition(piece GamePiece, move MovementType, landingPosition Position) (output bool){
+	fmt.Println("CHECKING CONDITION ")
+	for _, condition := range move.conditions {
+		fmt.Println(condition)
+		if condition.name == "en-passant"{
+			fmt.Println(piece)
+			fmt.Println("check En pass")
+			fmt.Println(landingPosition.X, piece.enPassant.X)
+			if landingPosition.X == piece.enPassant.X{
+				return true
+			}
+		}
+		if condition.name == "moved"  && piece.Moved == false {
+			output = true
+		}
+		if condition.name == "capture" {
+			output =  piece.capturing == condition.active
+		}
 	}
-	if move.Condition.name == "capture" {
-		return piece.capturing == move.Condition.active
-	}
-	if move.Condition.name == "en-passant"{
-
-	}
-	return false
+	return output
 }
 
 func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
@@ -204,6 +210,7 @@ func (c *ChessPlay) acceptMove(move Move){
 	newSquare := c.squares[move.LandingPosition] 
 	newSquare.gamePiece = piece
 	c.squares[move.LandingPosition] = newSquare
+	c.checkEnPassant(move)
 }
 
 func (c ChessPlay) checkCastle(move Move) (bool){

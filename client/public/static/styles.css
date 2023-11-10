@@ -22,14 +22,13 @@ main {
   "blank A7 B7 C7 D7 E7 F7 G7 H7 number7"
   "blank A8 B8 C8 D8 E8 8F G8 H8 number8"
   "blank3 A-bottom B-bottom C-bottom D-bottom E-bottom F-bottom G-bottom H-bottom I-bottom blank4";
-  column-gap: 0px;
   aspect-ratio: 1/1;
   max-width: 700px;
 
 }
 
 .selected-square{
-  border: hotpink 2px solid;
+  border: hotpink 3px solid;
 }
 
 

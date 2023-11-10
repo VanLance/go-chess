@@ -10,7 +10,7 @@ type Condition struct {
 type MovementType struct {
 	X int
 	Y int
-	Condition
+	conditions []Condition
 }
 
 var MovementTypes = map[string][]MovementType{
@@ -18,23 +18,19 @@ var MovementTypes = map[string][]MovementType{
 		{
 			X:         0,
 			Y:         1,
-			Condition: Condition{name: "capture", active: false},
+			conditions: []Condition{{name: "capture", active: false}},
 		},
 		{
 			X:         0,
 			Y:         2,
-			Condition: Condition{name: "moved", active: false},
+			conditions: []Condition{{name: "moved", active: false}},
 		},
 		{
 			X:         1,
 			Y:         1,
-			Condition: Condition{name: "capture", active: true},
+			conditions: []Condition{{name: "capture", active: true}, {name:"en-passant", active: true}},
 		},
-		// {
-		// 	X:1,
-		// 	Y:1,
-		// 	Condition: Condition{name:"en-passant", active: true},
-		// },
+
 	},
 	"rook": {
 		{
@@ -108,15 +104,21 @@ func (c *ChessPlay) checkEnPassant(move Move) {
 	leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
 	rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
 	if leftSquare.gamePiece.Name == "pawn" && leftSquare.gamePiece.Player != move.player {
-		c.addEnPassant(&leftSquare.gamePiece, c.squares[move.StartingPosition].gamePiece)
+		piece := c.addEnPassant(&leftSquare.gamePiece, move)
+		leftSquare.gamePiece = *piece
 	} else if rightSquare.gamePiece.Name == "pawn" && rightSquare.gamePiece.Player != move.player {
-		c.addEnPassant(&rightSquare.gamePiece, c.squares[move.StartingPosition].gamePiece)
-	}
+		piece := c.addEnPassant(&rightSquare.gamePiece, move)
+		rightSquare.gamePiece = *piece
+	} 
+	
+	fmt.Println(leftSquare.gamePiece, "FROM CHEC EN P")
+	fmt.Println(rightSquare.gamePiece, "FROM CHEC EN P")
 }
 
-func (c *ChessPlay) addEnPassant(piece *GamePiece, targetPiece GamePiece) {
-	piece.enPassant = targetPiece.Position
-	fmt.Println(piece ," en YEAH baby")
+func (c *ChessPlay) addEnPassant(piece *GamePiece, move Move) *GamePiece{
+	piece.enPassant = move.LandingPosition
+	fmt.Println(piece.Position, piece.enPassant ," en YEAH baby")
+	return piece
 }
 
 func (c *ChessPlay) clearEnPassant() {
@@ -126,10 +128,6 @@ func (c *ChessPlay) clearEnPassant() {
 }
 
 func (c *ChessPlay) enPassantCapture(target GamePiece) {
-	captureSquare := c.squares[target.Position]
-	for _, v := range c.squares {
-		if v.gamePiece.Name == "" {
-			captureSquare.gamePiece = v.gamePiece
-		}
-	}
+	var emptySquare Square
+	c.squares[target.Position] = emptySquare
 }

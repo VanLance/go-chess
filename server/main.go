@@ -99,7 +99,6 @@ func main() {
 }
 
 func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
-	fmt.Println(player, "FROM RECREATE")
 	chess :=  ChessPlay{GameBoard: GameBoard{}, player1:Player{Team:1}, player2: Player{Team:2} }
 	chess.addSquares()
 	chess.playerTurn = player
