@@ -10,6 +10,7 @@ import (
 type Player struct {
 	Username string
 	Team int
+	
 }
 
 func getUserInput(prompt string) string {

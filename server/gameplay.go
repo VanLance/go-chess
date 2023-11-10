@@ -103,16 +103,15 @@ func (c *ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position
 }
 
 func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
-	fmt.Println("CHECKING MOVE")
 	spacesMoved := getSpacesMoved(move)
-	checkCondition := false
-	checkMove := MovementType{} 
 	if c.checkDirection(piece, move){
 		for _, validMove := range MovementTypes[piece.Name] {
 			if spacesMoved.X == validMove.X && spacesMoved.Y == validMove.Y{
 				if len(validMove.conditions) != 0 {
-					checkCondition = true
-					checkMove = validMove
+					if !c.checkCondition(piece, validMove, move.LandingPosition){
+						isValidMove = false
+						break
+					}
 				}
 				isValidMove = true
 			} else if ( spacesMoved.X != 0 ) && ( spacesMoved.Y != 0){
@@ -132,9 +131,6 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 			} 
 		}
 	}
-	if checkCondition && !c.checkCondition(piece, checkMove, move.LandingPosition){
-		isValidMove = false
-	}
 	piece.capturing = false
 	return isValidMove
 }
@@ -151,15 +147,9 @@ func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 }
 
 func (c ChessPlay) checkCondition(piece GamePiece, moveType MovementType, landingPosition Position) (output bool){
-	fmt.Println("CHECKING CONDITION ")
 	for _, condition := range moveType.conditions {
-		fmt.Println(condition)
 		if condition.name == "en-passant"{
-			fmt.Println(piece)
-			fmt.Println("check En pass")
-			fmt.Println(landingPosition.X, piece.EnPassant.X)
 			if landingPosition.X == piece.EnPassant.X{
-				fmt.Println("performing en passant")
 				c.enPassantCapture(piece.EnPassant)
 				return true
 			}
@@ -175,7 +165,6 @@ func (c ChessPlay) checkCondition(piece GamePiece, moveType MovementType, landin
 }
 
 func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
-	fmt.Println("CHECKING PATH!!!")
 	if piece.Name != "knight" {
 		spacesMoved := Position{ move.LandingPosition.X - move.StartingPosition.X, move.LandingPosition.Y - move.StartingPosition.Y }
 		currentSquare := move.StartingPosition
@@ -200,7 +189,6 @@ func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
 }
 
 func (c *ChessPlay) acceptMove(move Move){
-	fmt.Println("ACCEPTING !!!!!!!!!!!!!!!!", move)
 	if c.checkCastle(move){
 		c.castleKing(move)
 		return

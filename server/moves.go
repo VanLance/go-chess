@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+
 
 type Condition struct {
 	name   string
@@ -100,36 +100,30 @@ type EnPassant struct {
 	target Position
 }
 
-// func (c ChessPlay) getAdjacentSquares(move Move) (Square, Square){
-// 	leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
-// 	rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
-// 	return leftSquare, rightSquare
-// }
+func (c ChessPlay) getAdjacentSquares(move Move) (Square, Square){
+	leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
+	rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
+	return leftSquare, rightSquare
+}
 
 func (c *ChessPlay) checkEnPassant(move Move) {
 	p := Position{X:0,Y:2}
 	if p == getSpacesMoved(move){
-		leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
-		rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
+		leftSquare, rightSquare := c.getAdjacentSquares(move) 
 		if leftSquare.gamePiece.Name == "pawn" && leftSquare.gamePiece.Player != move.player {
 			piece := c.addEnPassant(&leftSquare.gamePiece, move)
-			fmt.Println(*piece, "assinging to square left")
 			leftSquare.addGamePiece(*piece)
 			c.GameBoard.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}] = leftSquare
-			fmt.Println(c.GameBoard.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}], "UPDATING SQARE left ")
 		} else if rightSquare.gamePiece.Name == "pawn" && rightSquare.gamePiece.Player != move.player {
 			piece := c.addEnPassant(&rightSquare.gamePiece, move)
-			fmt.Println(*piece, "assinging to square right")
 			rightSquare.addGamePiece(*piece)
 			c.GameBoard.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}] = rightSquare
-			fmt.Println(c.GameBoard.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}], "UPDATING SQARE right")
 		}
 	}
 }
 
 func (c *ChessPlay) addEnPassant(piece *GamePiece, move Move) *GamePiece{
 	piece.EnPassant = move.LandingPosition
-	fmt.Println(piece.Position, piece.EnPassant ," en YEAH baby")
 	return piece
 }
 
