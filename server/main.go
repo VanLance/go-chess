@@ -106,6 +106,9 @@ func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
 		square := chess.GameBoard.squares[piece.Position]
 		square.gamePiece = piece
 		chess.GameBoard.squares[piece.Position] = square
+		if piece.Name == "king"{
+			piece.Player.king = piece.Position
+		}
 	}
 	chess.displayBoard()
 	return chess

@@ -13,6 +13,7 @@ type Piece = Position & {
   Name: string
   Username?: string
   Team: number
+  EnPassant: Position
 }
 
 type Position = {
