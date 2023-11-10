@@ -100,34 +100,49 @@ type EnPassant struct {
 	target Position
 }
 
+// func (c ChessPlay) getAdjacentSquares(move Move) (Square, Square){
+// 	leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
+// 	rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
+// 	return leftSquare, rightSquare
+// }
+
 func (c *ChessPlay) checkEnPassant(move Move) {
-	leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
-	rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
-	if leftSquare.gamePiece.Name == "pawn" && leftSquare.gamePiece.Player != move.player {
-		piece := c.addEnPassant(&leftSquare.gamePiece, move)
-		leftSquare.gamePiece = *piece
-	} else if rightSquare.gamePiece.Name == "pawn" && rightSquare.gamePiece.Player != move.player {
-		piece := c.addEnPassant(&rightSquare.gamePiece, move)
-		rightSquare.gamePiece = *piece
-	} 
-	
-	fmt.Println(leftSquare.gamePiece, "FROM CHEC EN P")
-	fmt.Println(rightSquare.gamePiece, "FROM CHEC EN P")
+	p := Position{X:0,Y:2}
+	if p == getSpacesMoved(move){
+		leftSquare := c.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}]
+		rightSquare := c.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}]
+		if leftSquare.gamePiece.Name == "pawn" && leftSquare.gamePiece.Player != move.player {
+			piece := c.addEnPassant(&leftSquare.gamePiece, move)
+			fmt.Println(*piece, "assinging to square left")
+			leftSquare.addGamePiece(*piece)
+			c.GameBoard.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}] = leftSquare
+			fmt.Println(c.GameBoard.squares[Position{X: move.LandingPosition.X - 1, Y: move.LandingPosition.Y}], "UPDATING SQARE left ")
+		} else if rightSquare.gamePiece.Name == "pawn" && rightSquare.gamePiece.Player != move.player {
+			piece := c.addEnPassant(&rightSquare.gamePiece, move)
+			fmt.Println(*piece, "assinging to square right")
+			rightSquare.addGamePiece(*piece)
+			c.GameBoard.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}] = rightSquare
+			fmt.Println(c.GameBoard.squares[Position{X: move.LandingPosition.X + 1, Y: move.LandingPosition.Y}], "UPDATING SQARE right")
+		}
+	}
 }
 
 func (c *ChessPlay) addEnPassant(piece *GamePiece, move Move) *GamePiece{
-	piece.enPassant = move.LandingPosition
-	fmt.Println(piece.Position, piece.enPassant ," en YEAH baby")
+	piece.EnPassant = move.LandingPosition
+	fmt.Println(piece.Position, piece.EnPassant ," en YEAH baby")
 	return piece
 }
 
 func (c *ChessPlay) clearEnPassant() {
-	for _, v := range c.squares {
-		v.gamePiece.enPassant = Position{X: 0, Y: 0}
+	for position, v := range c.squares {
+		v.gamePiece.EnPassant = Position{X: 0, Y: 0}
+		c.GameBoard.squares[position] = v
 	}
 }
 
-func (c *ChessPlay) enPassantCapture(target GamePiece) {
+func (c *ChessPlay) enPassantCapture(position Position) {
 	var emptySquare Square
-	c.squares[target.Position] = emptySquare
+	c.squares[position] = emptySquare
+	oldSquare := c.GameBoard.squares[position]
+	oldSquare.addGamePiece(GamePiece{})
 }

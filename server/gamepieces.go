@@ -9,7 +9,7 @@ type GamePiece struct{
 	Distance bool
 	Moved bool
 	capturing bool
-	enPassant Position
+	EnPassant Position
 	Position
 }
 

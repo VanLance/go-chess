@@ -104,7 +104,7 @@ func (c *ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position
 
 func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 	fmt.Println("CHECKING MOVE")
-	spacesMoved := Position{getAbsolute(move.LandingPosition.X - move.StartingPosition.X), getAbsolute(move.LandingPosition.Y - move.StartingPosition.Y)}
+	spacesMoved := getSpacesMoved(move)
 	checkCondition := false
 	checkMove := MovementType{} 
 	if c.checkDirection(piece, move){
@@ -150,15 +150,17 @@ func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 	return true
 }
 
-func (c ChessPlay) checkCondition(piece GamePiece, move MovementType, landingPosition Position) (output bool){
+func (c ChessPlay) checkCondition(piece GamePiece, moveType MovementType, landingPosition Position) (output bool){
 	fmt.Println("CHECKING CONDITION ")
-	for _, condition := range move.conditions {
+	for _, condition := range moveType.conditions {
 		fmt.Println(condition)
 		if condition.name == "en-passant"{
 			fmt.Println(piece)
 			fmt.Println("check En pass")
-			fmt.Println(landingPosition.X, piece.enPassant.X)
-			if landingPosition.X == piece.enPassant.X{
+			fmt.Println(landingPosition.X, piece.EnPassant.X)
+			if landingPosition.X == piece.EnPassant.X{
+				fmt.Println("performing en passant")
+				c.enPassantCapture(piece.EnPassant)
 				return true
 			}
 		}
@@ -210,6 +212,7 @@ func (c *ChessPlay) acceptMove(move Move){
 	newSquare := c.squares[move.LandingPosition] 
 	newSquare.gamePiece = piece
 	c.squares[move.LandingPosition] = newSquare
+	c.clearEnPassant()
 	c.checkEnPassant(move)
 }
 
@@ -253,4 +256,8 @@ func getAbsolute(number int) int{
 		return number
 	}
 	return -number
+}
+
+func getSpacesMoved(move Move) Position{
+	return Position{getAbsolute(move.LandingPosition.X - move.StartingPosition.X), getAbsolute(move.LandingPosition.Y - move.StartingPosition.Y)}
 }
