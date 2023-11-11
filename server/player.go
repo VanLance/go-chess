@@ -43,7 +43,5 @@ func convertFirstCharacterToInt(char byte) int{
 
 
 func (p *Player) updateKingPosition(position Position){
-	fmt.Println(p.king, "BEFORE FROM PLAYER UPDATE")
 	p.king = position
-	fmt.Println(p.king, "AFTER FROM PLAYER UPDATE")
 }

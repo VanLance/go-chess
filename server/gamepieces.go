@@ -1,8 +1,5 @@
 package main
 
-// import "fmt"
-
-
 type GamePiece struct{
 	Name string
 	Player
