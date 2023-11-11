@@ -21,7 +21,7 @@ func getUserInput(prompt string) string {
 }
 
 func (p Player) selectMove(StartingPosition, LandingPosition Position) Move{
-	return Move{StartingPosition: StartingPosition, LandingPosition: LandingPosition, player: p}
+	return Move{StartingPosition: StartingPosition, LandingPosition: LandingPosition, player: &p}
 }
 func (p Player) selectMoveWithString(StartingPosition, LandingPosition string) Move{
 	startingXInt := convertFirstCharacterToInt(StartingPosition[0])
@@ -39,4 +39,11 @@ func convertFirstCharacterToInt(char byte) int{
 	}
 	int, _ := strconv.Atoi(string(char))
 	return int
+}
+
+
+func (p *Player) updateKingPosition(position Position){
+	fmt.Println(p.king, "BEFORE FROM PLAYER UPDATE")
+	p.king = position
+	fmt.Println(p.king, "AFTER FROM PLAYER UPDATE")
 }

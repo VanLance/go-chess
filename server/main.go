@@ -28,8 +28,7 @@ type ClientMove struct {
 
 func handleStart(w http.ResponseWriter, r *http.Request) {
 	chess := createChess()
-	chess.playerTurn = chess.player1
-	jsonRes := createBoardRes(chess)
+	jsonRes := createBoardRes(chess, "starting pieces")
 	w.Header().Set("Content-Type","application/json")
 	res, err := json.Marshal(jsonRes)
 	if err != nil{
@@ -40,7 +39,7 @@ func handleStart(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func createBoardRes(chess ChessPlay) JSONRes{
+func createBoardRes(chess ChessPlay, message string) JSONRes{
 	playerOnePieces := []GamePiece{}
 	playerTwoPieces := []GamePiece{}
 	for position, square := range chess.GameBoard.squares{
@@ -53,7 +52,7 @@ func createBoardRes(chess ChessPlay) JSONRes{
 			}
 		}
 	}
-	return JSONRes{PlayerOnePieces: playerOnePieces, PlayerTwoPieces: playerTwoPieces, PlayerTurn: chess.playerTurn, Message: "Starting Pieces" }
+	return JSONRes{PlayerOnePieces: playerOnePieces, PlayerTwoPieces: playerTwoPieces, PlayerTurn: *chess.playerTurn, Message: message }
 }
 
 func handleMove(w http.ResponseWriter, r *http.Request){
@@ -71,7 +70,7 @@ func handleMove(w http.ResponseWriter, r *http.Request){
 	move := chess.playerTurn.selectMoveWithString(m.ClientMove.StartingPosition, m.ClientMove.LandingPosition)
 	chess.makeMove(move)
 	chess.displayBoard()
-	jsonRes := createBoardRes(chess)
+	jsonRes := createBoardRes(chess, "move accepted")
 	w.Header().Set("Content-Type","application/json")
 	res, err := json.Marshal(jsonRes)
 	if err != nil{
@@ -99,17 +98,41 @@ func main() {
 }
 
 func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
-	chess :=  ChessPlay{GameBoard: GameBoard{}, player1:Player{Team:1}, player2: Player{Team:2} }
+	chess :=  ChessPlay{GameBoard: GameBoard{}, player1: Player{ Team: 1 }, player2: Player{ Team: 2}}
+	if player.Team == 1 {
+		chess.playerTurn = &chess.player1
+		} else {
+		chess.playerTurn = &chess.player2
+	}
+	fmt.Println(chess.playerTurn, "RECREATE PLAYER TURN")
 	chess.addSquares()
-	chess.playerTurn = player
+	chess.playerTurn = &player
 	for _, piece := range pieces {
 		square := chess.GameBoard.squares[piece.Position]
 		square = piece
 		chess.GameBoard.squares[piece.Position] = square
 		if piece.Name == "king"{
-			piece.Player.king = piece.Position
+			fmt.Println("FOUND KING", piece.Name)
+			piecePlayer := piece.Player
+			piecePlayer.king = piece.Position
+			fmt.Println(piecePlayer, "FOUND PLAYAS KING BOI")
+			if piecePlayer.Team == chess.player1.Team {
+				chess.player1 = piecePlayer
+				} else {
+					chess.player2 = piecePlayer
+				}
+			if piecePlayer.Team == chess.playerTurn.Team{
+				if piecePlayer.Team == chess.player1.Team {
+					chess.playerTurn = &chess.player1
+					fmt.Println("PLAYER 1 TURN")
+					} else {
+						chess.playerTurn = &chess.player2
+						fmt.Println("PLAYER 2 TURN")
+					}
+				}
+			}
 		}
-	}
+		fmt.Println(chess.playerTurn, "RECREATE PLAYER TURN END")
 	chess.displayBoard()
 	return chess
 }

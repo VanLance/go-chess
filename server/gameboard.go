@@ -20,8 +20,6 @@ type GameBoard struct{
 
 
 
-
-
 func (g *GameBoard) addSquares() {
 	g.squares= make(map[Position]GamePiece)
 	for numX := 1; numX <= 8; numX++ {
