@@ -7,6 +7,8 @@ import (
 
 type ChessPlay struct {
 	GameBoard
+	player1 Player
+	player2 Player
 	playerTurn *Player
 	Winner Player
 	Message string
@@ -19,29 +21,29 @@ type Move struct{
 }
 
 func createChess() ChessPlay{
-	gameBoard := GameBoard{Player1: Player{Team:1}, Player2: Player{Team:2}}
+	gameBoard := GameBoard{}
 	gameBoard.startingBoard()
-	// gameBoard.displayBoard()
-	chess :=  ChessPlay{GameBoard: gameBoard}
-	chess.playerTurn = &chess.GameBoard.Player1
+	gameBoard.displayBoard()
+	chess :=  ChessPlay{GameBoard: gameBoard, player1:Player{Team:1}, player2: Player{Team:2} }
+	chess.playerTurn = &chess.player1
 	return chess
 }
 
 func (c *ChessPlay) driver(){
-	move := c.GameBoard.Player1.selectMove(Position{1,2},Position{1,4})
+	move := c.player1.selectMove(Position{1,2},Position{1,4})
 	c.makeMove(move)
-	move = c.GameBoard.Player2.selectMove(Position{2,7},Position{2,5})
+	move = c.player2.selectMove(Position{2,7},Position{2,5})
 	c.makeMove(move)
-	move = c.GameBoard.Player1.selectMove(Position{1,4},Position{1,6})
+	move = c.player1.selectMove(Position{1,4},Position{1,6})
 	c.makeMove(move)
-	move = c.GameBoard.Player1.selectMove(Position{1,4},Position{2,5})
+	move = c.player1.selectMove(Position{1,4},Position{2,5})
 	c.makeMove(move)
-	move = c.GameBoard.Player2.selectMove(Position{2,5},Position{2,4})
+	move = c.player2.selectMove(Position{2,5},Position{2,4})
 	c.makeMove(move)
-	move = c.GameBoard.Player2.selectMoveWithString("57","55")
+	move = c.player2.selectMoveWithString("57","55")
 	c.makeMove(move)
-	c.makeMove(c.GameBoard.Player1.selectMoveWithString("52","54"))
-	c.makeMove(c.GameBoard.Player2.selectMoveWithString("55","54"))
+	c.makeMove(c.player1.selectMoveWithString("52","54"))
+	c.makeMove(c.player2.selectMoveWithString("55","54"))
 }
 
 func (c ChessPlay) isValidMove(move Move) bool {
@@ -57,11 +59,11 @@ func (c *ChessPlay) makeMove(move Move){
 		c.acceptMove(move)
 		// c.moveTurn()
 	}
-	// c.displayBoard()
+	c.displayBoard()
 	if c.Winner.Team != 0 {
 		fmt.Println("\n", "Winner: ", c.Winner.Team)
   } else {
-		fmt.Println("\n", c.playerTurn, "'s turn")	
+		fmt.Println("\n Player ", c.playerTurn.Team, "'s turn")	
 	}
 }
 
@@ -75,25 +77,20 @@ func (c ChessPlay) getPiece(position Position) GamePiece{
 }
 
 func (c ChessPlay) checkValidLanding(piece *GamePiece, LandingPosition Position) bool{
-	fmt.Println("CHECKING LANDING !!!!!!!!!!!!!!!!!!!")
-	fmt.Println(c.squares[LandingPosition]," HELPP !!!!")
-	if c.squares[LandingPosition].Name != ""{
-		landingPositionPiecePlayer := c.squares[LandingPosition].Player
-		fmt.Println(landingPositionPiecePlayer," HELPP !!!!")
-		if piece.Player.Team ==	landingPositionPiecePlayer.Team {
-			if (piece.Name != "rook" && c.squares[LandingPosition].Name != "king"){
-				fmt.Println("landing on owned piece")
-				return false
-			}
-		} else if piece.Player.Team !=	landingPositionPiecePlayer.Team &&	landingPositionPiecePlayer.Team != 0 {
-			capturedPiece := c.squares[LandingPosition]
-			if capturedPiece.Name == "king"{
-				c.Winner = *piece.Player
-			}
-			fmt.Println("\nCaptured ", capturedPiece)
-			fmt.Println("")
-			piece.capturing = true
+	LandingPositionPiecePlayer := c.squares[LandingPosition].Player
+	if piece.Player.Team == LandingPositionPiecePlayer.Team {
+		if (piece.Name != "rook" && c.squares[LandingPosition].Name != "king"){
+			fmt.Println("landing on owned piece")
+			return false
 		}
+	} else if piece.Player.Team != LandingPositionPiecePlayer.Team && LandingPositionPiecePlayer.Team != 0 {
+		capturedPiece := c.squares[LandingPosition]
+		if capturedPiece.Name == "king"{
+			c.Winner = piece.Player
+		}
+		fmt.Println("\nCaptured ", capturedPiece)
+		fmt.Println("")
+		piece.capturing = true
 	}
 	return true
 }
@@ -133,7 +130,7 @@ func (c ChessPlay) checkMove(piece GamePiece, move Move) (isValidMove bool){
 
 func (c ChessPlay) checkDirection(piece GamePiece, move Move) bool{
 	if piece.Name == "pawn" {
-		if *c.playerTurn == c.GameBoard.Player1{
+		if *c.playerTurn == c.player1{
 			return move.StartingPosition.Y < move.LandingPosition.Y
 		} else {
 			return move.StartingPosition.Y > move.LandingPosition.Y
@@ -165,7 +162,7 @@ func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
 		spacesMoved := Position{ move.LandingPosition.X - move.StartingPosition.X, move.LandingPosition.Y - move.StartingPosition.Y }
 		currentSquare := move.StartingPosition
 		for currentSquare != move.LandingPosition{
-			if c.squares[currentSquare].Player.Team == c.playerTurn.Team && currentSquare != move.StartingPosition {
+			if c.squares[currentSquare].Player.Team != 0 && currentSquare != move.StartingPosition {
 				return false
 			}
 			if ( spacesMoved.X > 0 ) {
@@ -185,46 +182,50 @@ func (c ChessPlay) checkPath(piece GamePiece, move Move) bool{
 }
 
 func (c *ChessPlay) acceptMove(move Move){
-	fmt.Println("ACCEPTING MOVE", c.playerTurn)
+	fmt.Println("ACCEPT MOVE", c.playerTurn)
 	if c.checkCastle(move){
+		fmt.Println("CHECKING CASTLE")
 		c.castleKing(move)
+		c.moveTurn()
 		return
 	}
 	if c.getPiece(move.StartingPosition).Name == "king"{
-		fmt.Println("YEP FOUND KING")
-		if c.playerTurn.Team == c.GameBoard.Player1.Team {
-			c.GameBoard.Player1.king = move.LandingPosition
-			fmt.Println(c.GameBoard.Player1.king , "PLAYER 1 POS")
+		fmt.Println("UPDATING KING POSTIOIN BEFORE", move.player.king)
+		// move.player.updateKingPosition(move.LandingPosition) 
+		if move.player.Team == c.player1.Team{
+			c.player1.king = move.LandingPosition
 		} else {
-			c.GameBoard.Player2.king = move.LandingPosition
-			fmt.Println(c.GameBoard.Player2.king , "PLAYER 2 POS")
+			c.player2.king = move.LandingPosition
 		}
-		fmt.Println("UPDATING KING POSTIOIN", c.playerTurn.king)
-	} 
-	piece := c.squares[move.StartingPosition]
-	oldPiece := c.squares[move.LandingPosition] 
-	c.squares[move.StartingPosition] = GamePiece{}
-	c.squares[move.LandingPosition] = piece
-	if c.isCheck(){
-		c.squares[move.StartingPosition] = piece
-		c.squares[move.LandingPosition] = oldPiece
-		if c.getPiece(move.StartingPosition).Name == "king"{
-			fmt.Println("UPDATING KING POSTIOIN", c.playerTurn.king)
-			if c.playerTurn.Team == c.GameBoard.Player1.Team{
-				c.GameBoard.Player1.king = move.StartingPosition
-			} else {
-				c.GameBoard.Player2.king = move.StartingPosition
-			}
-			fmt.Println("UPDATING KING POSTIOIN", c.playerTurn.king)
+		fmt.Println("UPDATING KING POSTIOIN AFTER", c.playerTurn.king)
 		} 
-	} else {
-		piece.Moved = true
-		piece.capturing = false
+		piece := c.squares[move.StartingPosition]
+		oldPiece := c.squares[move.LandingPosition] 
+		c.squares[move.StartingPosition] = GamePiece{}
 		c.squares[move.LandingPosition] = piece
-		c.clearEnPassant()
-		c.checkEnPassant(move)
-		c.moveTurn()
-		fmt.Println(c.playerTurn, "AFTER NOT CHECK SHOULD SWITCH")
+		fmt.Println(c.playerTurn.king, c.player2.king, "WHERE THE KINGS AT")
+		if c.isCheck(){
+			c.squares[move.StartingPosition] = piece
+			c.squares[move.LandingPosition] = oldPiece
+			if c.getPiece(move.StartingPosition).Name == "king"{
+				fmt.Println("UPDATING KING POSTIOIN", c.playerTurn.king)
+				if c.playerTurn.Team == c.player1.Team{
+					c.player1.king = move.StartingPosition
+				} else {
+					c.player2.king = move.StartingPosition
+				}
+				// move.player.updateKingPosition(move.StartingPosition) 
+				fmt.Println("UPDATING KING POSTIOIN", c.playerTurn.king)
+		} 
+		} else {
+			fmt.Println("NOT CHECK", c.playerTurn)
+			piece.Moved = true
+			piece.capturing = false
+			c.squares[move.LandingPosition] = piece
+			c.clearEnPassant()
+			c.checkEnPassant(move)
+			c.moveTurn()
+			fmt.Println("NOT CHECK", c.playerTurn)
 	}
 
 }
@@ -233,10 +234,10 @@ func (c *ChessPlay) acceptMove(move Move){
 
 
 func (c *ChessPlay) moveTurn(){
-	if *c.playerTurn == c.GameBoard.Player1 {
-		c.playerTurn = &c.GameBoard.Player2
+	if c.playerTurn.Team == c.player1.Team {
+		c.playerTurn = &c.player2
 	} else {
-		c.playerTurn = &c.GameBoard.Player1
+		c.playerTurn = &c.player1
 	}
 }
 
@@ -244,16 +245,15 @@ func (c *ChessPlay) moveTurn(){
 func (c ChessPlay) isCheck() bool{
 	var attackingPlayer,  defendingTeam Player
 	if c.playerTurn.Team == 1{
-		defendingTeam = c.GameBoard.Player1
-		attackingPlayer = c.GameBoard.Player2
+		defendingTeam = c.player1
+		attackingPlayer = c.player2
 	} else {
-		defendingTeam = c.GameBoard.Player2
-		attackingPlayer = c.GameBoard.Player1
+		defendingTeam = c.player2
+		attackingPlayer = c.player1
 	}
 	fmt.Println(defendingTeam.king, "DEFENDING King")
-	fmt.Println(c.playerTurn, "FROM IN CHECK")
 	c.moveTurn()
-	fmt.Println(c.playerTurn, "FROM IN CHECK AFTER SWITCH")
+	fmt.Println("FROM IS CHECK", c.playerTurn)
 	for _, piece := range c.squares{
 		if piece.Name != ""{
 			if piece.Player.Team == attackingPlayer.Team{

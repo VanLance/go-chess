@@ -5,7 +5,7 @@ package main
 
 type GamePiece struct{
 	Name string
-	*Player
+	Player
 	Distance bool
 	Moved bool
 	capturing bool
@@ -13,12 +13,12 @@ type GamePiece struct{
 	Position
 }
 
-func (p *GamePiece) addPlayer(position Position, player1, player2 Player){
+func (p *GamePiece) addPlayer(position Position){
 	if position.Y == 1 || position.Y == 2{
-		p.Player = &player1
-	} else {
-		p.Player = &player2
-	}
+		p.Player.Team = 1
+		} else {
+			p.Player.Team = 2
+		}
 }
 
 var pawn = GamePiece {
