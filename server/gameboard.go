@@ -16,9 +16,9 @@ type Position struct{
 
 type GameBoard struct{ 
 	squares map[Position]GamePiece
+	Player1 Player
+  Player2 Player
 }
-
-
 
 
 
@@ -31,14 +31,15 @@ func (g *GameBoard) addSquares() {
 	}
 }
 
+
 func (g *GameBoard) addPawns() {
 	for numX := 1; numX <= 8; numX++ {
 		square1 := g.squares[Position{X:numX, Y:2}]
 		square2 := g.squares[Position{X:numX, Y:7}]
 		pawn1 := pawn
-		pawn1.addPlayer(Position{X:numX, Y:2})
+		pawn1.addPlayer(Position{X:numX, Y:2},g.Player1, g.Player2)
 		pawn2 := pawn
-		pawn2.addPlayer(Position{X:numX, Y:7})
+		pawn2.addPlayer(Position{X:numX, Y:7}, g.Player1, g.Player2)
 		square1 = pawn1
 		square2 = pawn2 
 		
@@ -48,9 +49,9 @@ func (g *GameBoard) addPawns() {
 }
 
 
-func (g *GameBoard) addPieces(piecePositions []Position, piece GamePiece) {
+func (g *GameBoard) addPieces(piecePositions []Position, piece GamePiece,) {
 	for _, position := range piecePositions {
-		piece.addPlayer(position)
+		piece.addPlayer(position, g.Player1, g.Player2)
 			square := g.squares[position]
 			square = piece
 			g.squares[position] = square
