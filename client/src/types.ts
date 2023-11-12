@@ -13,6 +13,7 @@ type Piece = Position & {
   Name: string
   Username?: string
   Team: number
+  Moved: boolean
   EnPassant: Position
 }
 

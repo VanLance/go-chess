@@ -4,26 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"go-chess/pkg"
 )
 
-type JSONRes struct {
-	PlayerOnePieces []GamePiece
-	PlayerTwoPieces []GamePiece
-	PlayerTurn Player
-	Winner Player
-	Message string
-}
-
-type MoveReq struct {
-	ClientMove `json:"move"`
-	PreviousState []GamePiece `json:"previousState"`
-}
-
-type ClientMove struct {
-	StartingPosition string `json:"startingPosition"`
-	LandingPosition string `json:"landingPosition"`
-	Player `json:"player"`
-}
 
 
 func handleStart(w http.ResponseWriter, r *http.Request) {
@@ -80,10 +63,23 @@ func handleMove(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 }
 
+func serveWs(w http.ResponseWriter, r *http.Request) {
+	ws, err := websocket.Upgrade(w,r)
+	if err != nil {
+		fmt.Fprintf(w, "%+V\n")
+	}
+	go websocket.Writer(ws)
+	websocket.Reader(ws)
+}
 
-func main() {
+func setupRoutes(){
 	http.HandleFunc("/", handleStart)
 	http.HandleFunc("/make-move", handleMove)
+	http.HandleFunc("/ws", serveWs)
+}
+
+func main() {
+	setupRoutes()
 	// Set up the middleware
 	handler := handleLogging(handleCORS(http.DefaultServeMux))
 
@@ -101,10 +97,9 @@ func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
 	chess :=  ChessPlay{GameBoard: GameBoard{}, player1: Player{ Team: 1 }, player2: Player{ Team: 2}}
 	if player.Team == 1 {
 		chess.playerTurn = &chess.player1
-		} else {
-		chess.playerTurn = &chess.player2
+	} else {
+	chess.playerTurn = &chess.player2
 	}
-	fmt.Println(chess.playerTurn, "RECREATE PLAYER TURN")
 	chess.addSquares()
 	chess.playerTurn = &player
 	for _, piece := range pieces {
@@ -112,27 +107,22 @@ func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
 		square = piece
 		chess.GameBoard.squares[piece.Position] = square
 		if piece.Name == "king"{
-			fmt.Println("FOUND KING", piece.Name)
 			piecePlayer := piece.Player
 			piecePlayer.king = piece.Position
-			fmt.Println(piecePlayer, "FOUND PLAYAS KING BOI")
 			if piecePlayer.Team == chess.player1.Team {
 				chess.player1 = piecePlayer
-				} else {
-					chess.player2 = piecePlayer
-				}
+			} else {
+				chess.player2 = piecePlayer
+			}
 			if piecePlayer.Team == chess.playerTurn.Team{
 				if piecePlayer.Team == chess.player1.Team {
 					chess.playerTurn = &chess.player1
-					fmt.Println("PLAYER 1 TURN")
-					} else {
-						chess.playerTurn = &chess.player2
-						fmt.Println("PLAYER 2 TURN")
-					}
+				} else {
+					chess.playerTurn = &chess.player2
 				}
 			}
 		}
-		fmt.Println(chess.playerTurn, "RECREATE PLAYER TURN END")
+	}
 	chess.displayBoard()
 	return chess
 }

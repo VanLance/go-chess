@@ -28,9 +28,6 @@ main {
   border: rgb(184, 34, 184) 2px solid;
 }
 
-.selected-square{
-  border: hotpink 3px solid;
-}
 
 
 main div {
@@ -57,4 +54,9 @@ img {
 
 .chess-square{
   border: yellow 2px solid;
+}
+
+.selected-square{
+    border: hotpink 3px solid;
   }
+  

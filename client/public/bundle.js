@@ -173,13 +173,19 @@ let chessState;
 (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
 async function getStartingPieces() {
     const res = await fetch("http://localhost:8080/");
-    const data = await res.json();
-    chessState = {
-        playerTurn: data.PlayerTurn,
-        pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
-    };
-    updateChessState(data);
-    return data;
+    if (res.ok) {
+        const data = await res.json();
+        chessState = {
+            playerTurn: data.PlayerTurn,
+            pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
+        };
+        updateChessState(data);
+        console.log("Response Data:", data);
+        return data;
+    }
+    else {
+        console.error('HTTP error:', res.status);
+    }
 }
 async function makeMove() {
     const res = await fetch("http://localhost:8080/make-move", {
@@ -211,6 +217,7 @@ function updateChessState(data) {
     chessState.playerTurn = data.PlayerTurn;
     chessState.pieces = [];
     chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
+    console.log(chessState.pieces, "LOOKING FOR MOVED");
     updatePlayerTurn();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.clearPieces)();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.addPieces)(...data.PlayerOnePieces, ...data.PlayerTwoPieces);

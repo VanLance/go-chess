@@ -8,13 +8,18 @@ createChessSquares()
 
 async function getStartingPieces(){
   const res = await fetch("http://localhost:8080/")
-  const data = await res.json()
-  chessState = {
-    playerTurn: data.PlayerTurn,
-    pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
+  if (res.ok) {
+    const data = await res.json()
+    chessState = {
+      playerTurn: data.PlayerTurn,
+      pieces: [...data.PlayerOnePieces, ...data.PlayerTwoPieces],
+    }
+    updateChessState(data)
+    console.log("Response Data:", data);
+    return data
+  } else {
+    console.error('HTTP error:', res.status);
   }
-  updateChessState(data)
-  return data
 }
 
 
@@ -47,6 +52,7 @@ function updateChessState(data: any){
     chessState.playerTurn = data.PlayerTurn
     chessState.pieces = []
     chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
+    console.log(chessState.pieces, "LOOKING FOR MOVED")
     updatePlayerTurn()
     clearPieces()
     addPieces(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
@@ -57,9 +63,43 @@ function updatePlayerTurn(){
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
 
+
+
 (async () => { (await getStartingPieces()) })()
 
 export {
   makeMove,
   chessState,
 }
+
+
+/* 
+var socket = new WebSocket("ws://localhost:8080/ws");
+
+let connect = () => {
+  console.log("Attempting Connection...");
+
+  socket.onopen = () => {
+    console.log("Successfully Connected");
+  };
+
+  socket.onmessage = msg => {
+    console.log(msg);
+  };
+
+  socket.onclose = event => {
+    console.log("Socket Closed Connection: ", event);
+  };
+
+  socket.onerror = error => {
+    console.log("Socket Error: ", error);
+  };
+};
+
+let sendMsg = msg => {
+  console.log("sending msg: ", msg);
+  socket.send(msg);
+};
+
+export { connect, sendMsg };
+*/
