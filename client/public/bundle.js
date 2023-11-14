@@ -168,6 +168,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   makeMove: () => (/* binding */ makeMove)
 /* harmony export */ });
 /* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
+/* harmony import */ var _websocket__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./websocket */ "./src/websocket.ts");
+
 
 let chessState;
 (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
@@ -217,7 +219,6 @@ function updateChessState(data) {
     chessState.playerTurn = data.PlayerTurn;
     chessState.pieces = [];
     chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
-    console.log(chessState.pieces, "LOOKING FOR MOVED");
     updatePlayerTurn();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.clearPieces)();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.addPieces)(...data.PlayerOnePieces, ...data.PlayerTwoPieces);
@@ -227,37 +228,46 @@ function updatePlayerTurn() {
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
 (async () => { (await getStartingPieces()); })();
+// connect()
+document.getElementById('webpack-connect')?.addEventListener('click', _websocket__WEBPACK_IMPORTED_MODULE_1__.connect);
 
-/*
+
+
+/***/ }),
+
+/***/ "./src/websocket.ts":
+/*!**************************!*\
+  !*** ./src/websocket.ts ***!
+  \**************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   connect: () => (/* binding */ connect),
+/* harmony export */   sendMsg: () => (/* binding */ sendMsg)
+/* harmony export */ });
 var socket = new WebSocket("ws://localhost:8080/ws");
-
 let connect = () => {
-  console.log("Attempting Connection...");
-
-  socket.onopen = () => {
-    console.log("Successfully Connected");
-  };
-
-  socket.onmessage = msg => {
-    console.log(msg);
-  };
-
-  socket.onclose = event => {
-    console.log("Socket Closed Connection: ", event);
-  };
-
-  socket.onerror = error => {
-    console.log("Socket Error: ", error);
-  };
+    console.log("Attempting Connection...");
+    socket.onopen = () => {
+        console.log("Successfully Connected");
+    };
+    socket.onmessage = msg => {
+        console.log(msg);
+    };
+    socket.onclose = event => {
+        console.log("Socket Closed Connection: ", event);
+    };
+    socket.onerror = error => {
+        console.log("Socket Error: ", error);
+    };
 };
-
-let sendMsg = msg => {
-  console.log("sending msg: ", msg);
-  socket.send(msg);
+let sendMsg = (msg) => {
+    console.log("sending msg: ", msg);
+    socket.send(msg);
 };
+document.getElementById('webpack-broadcast')?.addEventListener('click', () => { sendMsg("TEST"); });
 
-export { connect, sendMsg };
-*/ 
 
 
 /***/ })

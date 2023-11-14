@@ -1,5 +1,6 @@
 import { addPieces, clearPieces, createChessSquares } from './chessSquares'
 import { ChessState } from './types'
+import { connect } from './websocket'
 
 let chessState: ChessState
 
@@ -21,7 +22,6 @@ async function getStartingPieces(){
     console.error('HTTP error:', res.status);
   }
 }
-
 
 async function makeMove() {
   const res = await fetch("http://localhost:8080/make-move", {
@@ -52,7 +52,6 @@ function updateChessState(data: any){
     chessState.playerTurn = data.PlayerTurn
     chessState.pieces = []
     chessState.pieces.push(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
-    console.log(chessState.pieces, "LOOKING FOR MOVED")
     updatePlayerTurn()
     clearPieces()
     addPieces(...data.PlayerOnePieces, ...data.PlayerTwoPieces)
@@ -63,43 +62,14 @@ function updatePlayerTurn(){
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
 
-
-
 (async () => { (await getStartingPieces()) })()
+
+// connect()
+document.getElementById('webpack-connect')?.addEventListener('click',connect)
+
 
 export {
   makeMove,
   chessState,
 }
 
-
-/* 
-var socket = new WebSocket("ws://localhost:8080/ws");
-
-let connect = () => {
-  console.log("Attempting Connection...");
-
-  socket.onopen = () => {
-    console.log("Successfully Connected");
-  };
-
-  socket.onmessage = msg => {
-    console.log(msg);
-  };
-
-  socket.onclose = event => {
-    console.log("Socket Closed Connection: ", event);
-  };
-
-  socket.onerror = error => {
-    console.log("Socket Error: ", error);
-  };
-};
-
-let sendMsg = msg => {
-  console.log("sending msg: ", msg);
-  socket.send(msg);
-};
-
-export { connect, sendMsg };
-*/
