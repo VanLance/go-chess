@@ -1,5 +1,6 @@
 import { makeMove, chessState } from './index';
 import { ChessColumn, Move, Piece, Player, Position } from './types';
+import { player, sendMsg } from "./websocket"
 
 const xNumbers: { [key: number]: string } = {
   1: 'A',
@@ -46,7 +47,7 @@ function createChessDiv(number: number, letter: string): HTMLDivElement {
     div.classList.add('chess-square');
   }
   div.addEventListener('click', () => {
-    getPosition(chessState.playerTurn, div);
+    getPosition(div);
     checkForMove();
   });
   return div;
@@ -113,20 +114,23 @@ function checkCastle(player: Player, div: HTMLDivElement) {
   }
 }
 
-function getPosition(player: Player, div: HTMLDivElement) {
-  const squarePlayer = getPlayerFromDiv(div.classList);
-  if (
-    player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
-    !checkCastle(player, div)
-  ) {
-    clearActiveSquare();
-    chessState.move = {
-      startingPosition: getPositionFromDivId(div.id),
-      landingPosition: { X: 0, Y: 0 },
-    };
-    div.classList.add('selected-square');
-  } else if (chessState.move) {
-    chessState.move.landingPosition = getPositionFromDivId(div.id);
+function getPosition( div: HTMLDivElement) {
+  console.log(player, "PLAYER !")
+  if ( player.Team == chessState.playerTurn.Team ){
+    const squarePlayer = getPlayerFromDiv(div.classList);
+    if (
+      player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
+      !checkCastle(player, div)
+    ) {
+      clearActiveSquare();
+      chessState.move = {
+        startingPosition: getPositionFromDivId(div.id),
+        landingPosition: { X: 0, Y: 0 },
+      };
+      div.classList.add('selected-square');
+    } else if (chessState.move) {
+      chessState.move.landingPosition = getPositionFromDivId(div.id);
+    }
   }
 }
 
@@ -134,8 +138,8 @@ function checkForMove() {
   if (
     chessState.move?.startingPosition.X &&
     chessState.move?.landingPosition.X
-  ) {
-    makeMove();
+    ) {
+    sendMsg(JSON.stringify(chessState.move))
     chessState.move.startingPosition = { X: 0, Y: 0 };
     chessState.move.landingPosition = { X: 0, Y: 0 };
   }

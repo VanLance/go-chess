@@ -17,6 +17,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   createChessSquares: () => (/* binding */ createChessSquares)
 /* harmony export */ });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./src/index.ts");
+/* harmony import */ var _websocket__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./websocket */ "./src/websocket.ts");
+
 
 const xNumbers = {
     1: 'A',
@@ -65,7 +67,7 @@ function createChessDiv(number, letter) {
         div.classList.add('chess-square');
     }
     div.addEventListener('click', () => {
-        getPosition(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn, div);
+        getPosition(div);
         checkForMove();
     });
     return div;
@@ -118,25 +120,28 @@ function checkCastle(player, div) {
         }
     }
 }
-function getPosition(player, div) {
-    const squarePlayer = getPlayerFromDiv(div.classList);
-    if (player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
-        !checkCastle(player, div)) {
-        clearActiveSquare();
-        _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = {
-            startingPosition: getPositionFromDivId(div.id),
-            landingPosition: { X: 0, Y: 0 },
-        };
-        div.classList.add('selected-square');
-    }
-    else if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move) {
-        _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = getPositionFromDivId(div.id);
+function getPosition(div) {
+    console.log(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, "PLAYER !");
+    if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
+        const squarePlayer = getPlayerFromDiv(div.classList);
+        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
+            !checkCastle(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, div)) {
+            clearActiveSquare();
+            _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = {
+                startingPosition: getPositionFromDivId(div.id),
+                landingPosition: { X: 0, Y: 0 },
+            };
+            div.classList.add('selected-square');
+        }
+        else if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move) {
+            _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = getPositionFromDivId(div.id);
+        }
     }
 }
 function checkForMove() {
     if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X &&
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.landingPosition.X) {
-        (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
+        (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.startingPosition = { X: 0, Y: 0 };
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = { X: 0, Y: 0 };
     }
@@ -173,7 +178,8 @@ __webpack_require__.r(__webpack_exports__);
 
 let chessState;
 (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
-async function getStartingPieces() {
+(0,_websocket__WEBPACK_IMPORTED_MODULE_1__.connect)();
+async function startGame() {
     const res = await fetch("http://localhost:8080/");
     if (res.ok) {
         const data = await res.json();
@@ -227,7 +233,7 @@ function updatePlayerTurn() {
     let playerTurnP = document.getElementById('player-turn');
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
-(async () => { (await getStartingPieces()); })();
+(async () => { (await startGame()); })();
 // connect()
 document.getElementById('webpack-connect')?.addEventListener('click', _websocket__WEBPACK_IMPORTED_MODULE_1__.connect);
 
@@ -244,16 +250,39 @@ document.getElementById('webpack-connect')?.addEventListener('click', _websocket
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   connect: () => (/* binding */ connect),
+/* harmony export */   player: () => (/* binding */ player),
 /* harmony export */   sendMsg: () => (/* binding */ sendMsg)
 /* harmony export */ });
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./src/index.ts");
+
 var socket = new WebSocket("ws://localhost:8080/ws");
+let player;
 let connect = () => {
     console.log("Attempting Connection...");
     socket.onopen = () => {
         console.log("Successfully Connected");
     };
-    socket.onmessage = msg => {
-        console.log(msg);
+    socket.onmessage = event => {
+        let message = JSON.parse(event.data);
+        if (message.body === "player-1") {
+            player = {
+                username: '',
+                Team: 1
+            };
+        }
+        else if (message.body === "player-2") {
+            player = {
+                username: '',
+                Team: 2
+            };
+        }
+        else {
+            message = JSON.parse(message.body);
+            _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = message;
+            (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
+        }
+        console.log("Received message:", message);
+        console.log(player);
     };
     socket.onclose = event => {
         console.log("Socket Closed Connection: ", event);

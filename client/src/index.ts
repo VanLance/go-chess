@@ -4,10 +4,11 @@ import { connect } from './websocket'
 
 let chessState: ChessState
 
-
 createChessSquares()
 
-async function getStartingPieces(){
+connect()
+
+async function startGame(){
   const res = await fetch("http://localhost:8080/")
   if (res.ok) {
     const data = await res.json()
@@ -62,7 +63,7 @@ function updatePlayerTurn(){
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
 
-(async () => { (await getStartingPieces()) })()
+(async () => { (await startGame()) })()
 
 // connect()
 document.getElementById('webpack-connect')?.addEventListener('click',connect)
