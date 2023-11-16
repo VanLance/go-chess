@@ -7,21 +7,6 @@ import (
 	"go-chess/pkg/websocket"
 )
 
-
-
-func handleStart(w http.ResponseWriter, r *http.Request) {
-	chess := createChess()
-	jsonRes := createBoardRes(chess, "starting pieces")
-	w.Header().Set("Content-Type","application/json")
-	res, err := json.Marshal(jsonRes)
-	if err != nil{
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
-}
-
-
 func createBoardRes(chess ChessPlay, message string) JSONRes{
 	playerOnePieces := []GamePiece{}
 	playerTwoPieces := []GamePiece{}
@@ -35,10 +20,27 @@ func createBoardRes(chess ChessPlay, message string) JSONRes{
 			}
 		}
 	}
-	return JSONRes{PlayerOnePieces: playerOnePieces, PlayerTwoPieces: playerTwoPieces, PlayerTurn: *chess.playerTurn, Message: message }
+	return JSONRes { 
+		PlayerOnePieces: playerOnePieces, 
+		PlayerTwoPieces: playerTwoPieces,
+		PlayerTurn: *chess.playerTurn,
+		Message: message, 
+	}
 }
 
-func handleMove(w http.ResponseWriter, r *http.Request){
+func handleStart(w http.ResponseWriter, r *http.Request) {
+	chess := createChess()
+	jsonRes := createBoardRes(chess, "starting pieces")
+	w.Header().Set("Content-Type","application/json")
+	res, err := json.Marshal(jsonRes)
+	if err != nil{
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
+func handleMove( w http.ResponseWriter, r *http.Request){
 	var m MoveReq
 	
 	err := json.NewDecoder(r.Body).Decode(&m)
@@ -67,7 +69,7 @@ func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("WebSocket Endpoint Hit")
 	conn, err := websocket.Upgrade(w,r)
 	if err != nil {
-		fmt.Fprintf(w, "%+V\n")
+		fmt.Fprintf(w, "%+V\n", err)
 	}
 	
 	client := &websocket.Client{
@@ -76,14 +78,14 @@ func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	}
 
 	pool.Register <- client
+	
 	client.Read()
-
 }
 
+var pool *websocket.Pool = websocket.NewPool()
 func setupRoutes(){
-	pool := websocket.NewPool()
+	pool = websocket.NewPool()
 	go pool.Start()
-
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request){
 		serveWs(pool, w, r)
 	})
@@ -95,7 +97,6 @@ func main() {
 	setupRoutes()
 	// Set up the middleware
 	handler := handleLogging(handleCORS(http.DefaultServeMux))
-
 	// Use the handler for server
 	server := &http.Server{
 		Addr:    ":8080",
@@ -106,38 +107,12 @@ func main() {
 	}
 }
 
-func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
-	chess :=  ChessPlay{GameBoard: GameBoard{}, player1: Player{ Team: 1 }, player2: Player{ Team: 2}}
-	if player.Team == 1 {
-		chess.playerTurn = &chess.player1
-	} else {
-	chess.playerTurn = &chess.player2
-	}
-	chess.addSquares()
-	chess.playerTurn = &player
-	for _, piece := range pieces {
-		square := chess.GameBoard.squares[piece.Position]
-		square = piece
-		chess.GameBoard.squares[piece.Position] = square
-		if piece.Name == "king"{
-			piecePlayer := piece.Player
-			piecePlayer.king = piece.Position
-			if piecePlayer.Team == chess.player1.Team {
-				chess.player1 = piecePlayer
-			} else {
-				chess.player2 = piecePlayer
-			}
-			if piecePlayer.Team == chess.playerTurn.Team{
-				if piecePlayer.Team == chess.player1.Team {
-					chess.playerTurn = &chess.player1
-				} else {
-					chess.playerTurn = &chess.player2
-				}
-			}
-		}
-	}
-	chess.displayBoard()
-	return chess
+func handleLogging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Add your logging logic here
+		println("Request received:", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }
 
 func handleCORS(next http.Handler) http.Handler {
@@ -150,16 +125,7 @@ func handleCORS(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-
 		next.ServeHTTP(w, r)
 	})
 }
 
-func handleLogging(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Add your logging logic here
-		println("Request received:", r.Method, r.URL.Path)
-
-		next.ServeHTTP(w, r)
-	})
-}

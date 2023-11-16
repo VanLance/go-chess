@@ -12,13 +12,52 @@ type Position struct{
 	Y int
 }
 
-
-
 type GameBoard struct{ 
 	squares map[Position]GamePiece
 }
 
+func createChess() ChessPlay{
+	gameBoard := GameBoard{}
+	gameBoard.startingBoard()
+	// gameBoard.displayBoard()
+	chess :=  ChessPlay{GameBoard: gameBoard, player1:Player{Team:1}, player2: Player{Team:2} }
+	chess.playerTurn = &chess.player1
+	return chess
+}
 
+func recreateBoard(pieces []GamePiece, player Player) ChessPlay{
+	chess :=  ChessPlay{GameBoard: GameBoard{}, player1: Player{ Team: 1 }, player2: Player{ Team: 2}}
+	if player.Team == 1 {
+		chess.playerTurn = &chess.player1
+	} else {
+	chess.playerTurn = &chess.player2
+	}
+	chess.addSquares()
+	chess.playerTurn = &player
+	for _, piece := range pieces {
+		square := chess.GameBoard.squares[piece.Position]
+		square = piece
+		chess.GameBoard.squares[piece.Position] = square
+		if piece.Name == "king"{
+			piecePlayer := piece.Player
+			piecePlayer.king = piece.Position
+			if piecePlayer.Team == chess.player1.Team {
+				chess.player1 = piecePlayer
+			} else {
+				chess.player2 = piecePlayer
+			}
+			if piecePlayer.Team == chess.playerTurn.Team{
+				if piecePlayer.Team == chess.player1.Team {
+					chess.playerTurn = &chess.player1
+				} else {
+					chess.playerTurn = &chess.player2
+				}
+			}
+		}
+	}
+	// chess.displayBoard()
+	return chess
+}
 
 func (g *GameBoard) addSquares() {
 	g.squares= make(map[Position]GamePiece)

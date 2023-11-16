@@ -20,15 +20,6 @@ type Move struct{
 	player *Player
 }
 
-func createChess() ChessPlay{
-	gameBoard := GameBoard{}
-	gameBoard.startingBoard()
-	gameBoard.displayBoard()
-	chess :=  ChessPlay{GameBoard: gameBoard, player1:Player{Team:1}, player2: Player{Team:2} }
-	chess.playerTurn = &chess.player1
-	return chess
-}
-
 func (c *ChessPlay) driver(){
 	move := c.player1.selectMove(Position{1,2},Position{1,4})
 	c.makeMove(move)
@@ -59,7 +50,7 @@ func (c *ChessPlay) makeMove(move Move){
 		c.acceptMove(move)
 		// c.moveTurn()
 	}
-	c.displayBoard()
+	// c.displayBoard()
 	if c.Winner.Team != 0 {
 		fmt.Println("\n", "Winner: ", c.Winner.Team)
   } else {
