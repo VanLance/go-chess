@@ -54,7 +54,7 @@ function createChessDiv(number: number, letter: string): HTMLDivElement {
 }
 
 function addChessSquare(div: HTMLDivElement) {
-  document.getElementsByTagName('main')[0]?.appendChild(div);
+  document.querySelector('.chess-board')!.appendChild(div);
 }
 
 function addPieces(...pieces: Array<Piece>) {

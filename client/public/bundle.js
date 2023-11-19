@@ -73,7 +73,7 @@ function createChessDiv(number, letter) {
     return div;
 }
 function addChessSquare(div) {
-    document.getElementsByTagName('main')[0]?.appendChild(div);
+    document.querySelector('.chess-board').appendChild(div);
 }
 function addPieces(...pieces) {
     for (const piece of pieces) {
@@ -177,8 +177,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 let chessState;
-(0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
+let gamePlay;
+// const gamePlay = document.querySelector("#game-play")! as HTMLSelectElement
+// gamePlay.addEventListener("change", async ()=>{
+//   await startGame()
+//   gamePlay = gamePlay.value as "online" | "local"
+//   if (gamePlay == 'online'){
+//   }
+// })
 (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.connect)();
+(0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
 async function startGame() {
     const res = await fetch("http://localhost:8080/");
     if (res.ok) {
@@ -233,9 +241,9 @@ function updatePlayerTurn() {
     let playerTurnP = document.getElementById('player-turn');
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
-(async () => { (await startGame()); })();
-// connect()
-document.getElementById('webpack-connect')?.addEventListener('click', _websocket__WEBPACK_IMPORTED_MODULE_1__.connect);
+(async () => {
+    await startGame();
+})();
 
 
 

@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <script src="./bundle.js" defer></script>
-  <link rel="stylesheet" href="./static/styles.css">
-</head>
-<body>
-  <main></main>
-  <p id="player-turn">Player Turn: </p>
-  <button id='webpack-connect'>Connect</button>
-  <button id='webpack-broadcast'>Broadcast</button>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./bundle.js" defer></script>
+    <link rel="stylesheet" href="./static/styles.css" />
+  </head>
+  <body>
+    <form>
+      <select name="game-play" id="game-play">
+        <option value="online">Online</option>
+        <option value="local">Local</option>
+      </select>
+    </form>
+    <main>
+      <div class="chess-board"></div>
+      <p id="player-turn">Player Turn:  </p>
+    </main>
+  </body>
 </html>

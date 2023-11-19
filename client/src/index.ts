@@ -2,11 +2,18 @@ import { addPieces, clearPieces, createChessSquares } from './chessSquares'
 import { ChessState } from './types'
 import { connect } from './websocket'
 
-let chessState: ChessState
-
-createChessSquares()
-
+let chessState: ChessState 
+let gamePlay: 'online' | 'local'
+// const gamePlay = document.querySelector("#game-play")! as HTMLSelectElement
+// gamePlay.addEventListener("change", async ()=>{
+//   await startGame()
+//   gamePlay = gamePlay.value as "online" | "local"
+//   if (gamePlay == 'online'){
+  //   }
+  // })
+  
 connect()
+createChessSquares()
 
 async function startGame(){
   const res = await fetch("http://localhost:8080/")
@@ -63,10 +70,9 @@ function updatePlayerTurn(){
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
 
-(async () => { (await startGame()) })()
-
-// connect()
-document.getElementById('webpack-connect')?.addEventListener('click',connect)
+(async () => { 
+  await startGame()
+})()
 
 
 export {

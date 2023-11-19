@@ -6,7 +6,7 @@ body {
   color: hotpink; 
 } 
 
-main {
+.chess-board {
   margin-top: 20px;
   display: grid;
   grid-template-rows: repeat(10, 1fr);
@@ -30,7 +30,7 @@ main {
 
 
 
-main div {
+.chess-board > div {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -58,5 +58,9 @@ img {
 
 .selected-square{
     border: hotpink 3px solid;
-  }
-  
+}
+
+
+.hide {
+  display: none;
+}
