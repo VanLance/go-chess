@@ -3,7 +3,7 @@ import { ChessState } from './types'
 import { connect } from './websocket'
 
 let chessState: ChessState 
-let gameplay: 'online' | 'local'
+
 
 async function startGame(){
   const res = await fetch("http://localhost:8080/")

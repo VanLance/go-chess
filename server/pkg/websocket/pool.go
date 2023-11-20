@@ -27,8 +27,10 @@ func (p *Pool) Start() {
 		case client := <- p.Register:
 			p.Players++
 			if p.Players == 1 {
+				fmt.Println("PLAYERS", p.Players)
 				client.Conn.WriteJSON(Message{Type: 1, Body: "player-1"})
-			} else if p.Players == 2 {
+				} else if p.Players == 2 {
+				fmt.Println("PLAYERS", p.Players)
 				client.Conn.WriteJSON(Message{Type: 1, Body: "player-2"})
 			}
 			p.Clients[client] = true

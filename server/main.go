@@ -83,6 +83,7 @@ func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 }
 
 var pool *websocket.Pool = websocket.NewPool()
+
 func setupRoutes(){
 	pool = websocket.NewPool()
 	go pool.Start()
