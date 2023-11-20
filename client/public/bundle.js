@@ -170,23 +170,13 @@ function getPlayerFromDiv(divClassList) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   chessState: () => (/* binding */ chessState),
-/* harmony export */   makeMove: () => (/* binding */ makeMove)
+/* harmony export */   makeMove: () => (/* binding */ makeMove),
+/* harmony export */   startGame: () => (/* binding */ startGame)
 /* harmony export */ });
 /* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
-/* harmony import */ var _websocket__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./websocket */ "./src/websocket.ts");
-
 
 let chessState;
-let gamePlay;
-// const gamePlay = document.querySelector("#game-play")! as HTMLSelectElement
-// gamePlay.addEventListener("change", async ()=>{
-//   await startGame()
-//   gamePlay = gamePlay.value as "online" | "local"
-//   if (gamePlay == 'online'){
-//   }
-// })
-(0,_websocket__WEBPACK_IMPORTED_MODULE_1__.connect)();
-(0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
+let gameplay;
 async function startGame() {
     const res = await fetch("http://localhost:8080/");
     if (res.ok) {
@@ -241,9 +231,9 @@ function updatePlayerTurn() {
     let playerTurnP = document.getElementById('player-turn');
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
-(async () => {
-    await startGame();
-})();
+// (async () => { 
+//   await startGame()
+// })()
 
 
 
@@ -261,49 +251,62 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   player: () => (/* binding */ player),
 /* harmony export */   sendMsg: () => (/* binding */ sendMsg)
 /* harmony export */ });
-/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./src/index.ts");
+/* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./src/index.ts");
 
-var socket = new WebSocket("ws://localhost:8080/ws");
+
 let player;
-let connect = () => {
-    console.log("Attempting Connection...");
-    socket.onopen = () => {
-        console.log("Successfully Connected");
+let connect;
+let sendMsg;
+let socket;
+const main = document.getElementsByTagName('main')[0];
+const gameplayForm = document.querySelector("#gameplay-form");
+gameplayForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
+    socket = new WebSocket("ws://localhost:8080/ws");
+    await (0,_index__WEBPACK_IMPORTED_MODULE_1__.startGame)();
+    main.classList.toggle('hide');
+    connect = () => {
+        console.log("Attempting Connection...");
+        socket.onopen = () => {
+            console.log("Successfully Connected");
+        };
+        socket.onmessage = event => {
+            let message = JSON.parse(event.data);
+            if (message.body === "player-1") {
+                player = {
+                    username: '',
+                    Team: 1
+                };
+            }
+            else if (message.body === "player-2") {
+                player = {
+                    username: '',
+                    Team: 2
+                };
+            }
+            else {
+                message = JSON.parse(message.body);
+                _index__WEBPACK_IMPORTED_MODULE_1__.chessState.move = message;
+                (0,_index__WEBPACK_IMPORTED_MODULE_1__.makeMove)();
+            }
+            console.log("Received message:", message);
+            console.log(player);
+        };
+        socket.onclose = event => {
+            console.log("Socket Closed Connection: ", event);
+        };
+        socket.onerror = error => {
+            console.log("Socket Error: ", error);
+        };
     };
-    socket.onmessage = event => {
-        let message = JSON.parse(event.data);
-        if (message.body === "player-1") {
-            player = {
-                username: '',
-                Team: 1
-            };
-        }
-        else if (message.body === "player-2") {
-            player = {
-                username: '',
-                Team: 2
-            };
-        }
-        else {
-            message = JSON.parse(message.body);
-            _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = message;
-            (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
-        }
-        console.log("Received message:", message);
-        console.log(player);
-    };
-    socket.onclose = event => {
-        console.log("Socket Closed Connection: ", event);
-    };
-    socket.onerror = error => {
-        console.log("Socket Error: ", error);
-    };
-};
-let sendMsg = (msg) => {
+    connect();
+});
+sendMsg = (msg) => {
     console.log("sending msg: ", msg);
     socket.send(msg);
 };
-document.getElementById('webpack-broadcast')?.addEventListener('click', () => { sendMsg("TEST"); });
 
 
 

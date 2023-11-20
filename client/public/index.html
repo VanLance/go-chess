@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="./static/styles.css" />
   </head>
   <body>
-    <form>
+    <form id="gameplay-form">
+      <label for="online">Game Style: </label> <br> <br>
       <select name="game-play" id="game-play">
         <option value="online">Online</option>
         <option value="local">Local</option>
-      </select>
+      </select> <br> <br>
+      <input type="submit" value="Submit">
     </form>
-    <main>
+    <main class="hide">
       <div class="chess-board"></div>
       <p id="player-turn">Player Turn:  </p>
     </main>

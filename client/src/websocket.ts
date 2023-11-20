@@ -1,55 +1,69 @@
-import { chessState, makeMove } from "./index";
+import { createChessSquares } from "./chessSquares";
+import { chessState, makeMove, startGame } from "./index";
 import { Player } from "./types";
 
-var socket = new WebSocket("ws://localhost:8080/ws");
 let player: Player
+let connect: () => void
+let sendMsg: (msg: any) => void
+let socket: WebSocket
+const main = document.getElementsByTagName('main')[0]!
 
-let connect = () => {
-  console.log("Attempting Connection...");
+const gameplayForm = document.querySelector("#gameplay-form")! as HTMLFormElement
+
+gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
+  e.preventDefault()
+  createChessSquares()
+  socket = new WebSocket("ws://localhost:8080/ws");
   
-  socket.onopen = () => {
-    console.log("Successfully Connected");
-  };
+  await startGame()
+  main.classList.toggle('hide')
   
-  socket.onmessage = event => {
-    let message = JSON.parse(event.data);
-    if (message.body === "player-1"){
-      player = {
-        username: '',
-        Team: 1
+  connect = () => {
+    console.log("Attempting Connection...");
+    
+    socket.onopen = () => {
+      console.log("Successfully Connected");
+    };
+    
+    socket.onmessage = event => {
+      let message = JSON.parse(event.data);
+      if (message.body === "player-1"){
+        player = {
+          username: '',
+          Team: 1
+        }
+      } else if (message.body === "player-2"){
+        player = {
+          username: '',
+          Team: 2
+        }
+      } else {
+        message = JSON.parse(message.body)
+        chessState.move = message
+        makeMove()
       }
-    } else if (message.body === "player-2"){
-      player = {
-        username: '',
-        Team: 2
-      }
-    } else {
-      message = JSON.parse(message.body)
-      chessState.move = message
-      makeMove()
+      console.log("Received message:", message);
+      console.log(player)
     }
-    console.log("Received message:", message);
-    console.log(player)
-  }
-  
-  socket.onclose = event => {
-    console.log("Socket Closed Connection: ", event);
+    
+    socket.onclose = event => {
+      console.log("Socket Closed Connection: ", event);
+    };
+    
+    socket.onerror = error => {
+      console.log("Socket Error: ", error);
+    };
   };
-  
-  socket.onerror = error => {
-    console.log("Socket Error: ", error);
-  };
-};
 
-let sendMsg = (msg: any)=> {
+  connect()
+}
+
+)
+sendMsg = (msg: any) => {
   console.log("sending msg: ", msg);
   socket.send(msg);
 };
 
-
-
-document.getElementById('webpack-broadcast')?.addEventListener('click',()=>{sendMsg("TEST")})
-
 export {
-  connect, sendMsg, player
+  connect, player, sendMsg
 }
