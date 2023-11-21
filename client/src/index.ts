@@ -1,6 +1,6 @@
 import { addPieces, clearPieces, createChessSquares } from './chessSquares'
 import { ChessState } from './types'
-import { connect } from './websocket'
+import { connect, gameplay, player } from './websocket'
 
 let chessState: ChessState 
 

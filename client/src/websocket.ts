@@ -75,5 +75,5 @@ sendMsg = (msg: any) => {
 };
 
 export {
-  connect, player, sendMsg
+  connect, player, sendMsg, gameplay
 }

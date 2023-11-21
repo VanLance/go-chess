@@ -67,7 +67,12 @@ function createChessDiv(number, letter) {
         div.classList.add('chess-square');
     }
     div.addEventListener('click', () => {
-        getPosition(div);
+        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player) {
+            getPosition(div);
+        }
+        else {
+            getPosition(div, _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn);
+        }
         checkForMove();
     });
     return div;
@@ -120,12 +125,14 @@ function checkCastle(player, div) {
         }
     }
 }
-function getPosition(div) {
-    console.log(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, "PLAYER !");
-    if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
+function getPosition(div, checkPlayer = null) {
+    if (!checkPlayer) {
+        checkPlayer = _websocket__WEBPACK_IMPORTED_MODULE_1__.player;
+    }
+    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
         const squarePlayer = getPlayerFromDiv(div.classList);
-        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
-            !checkCastle(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, div)) {
+        if (checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
+            !checkCastle(checkPlayer, div)) {
             clearActiveSquare();
             _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = {
                 startingPosition: getPositionFromDivId(div.id),
@@ -141,7 +148,12 @@ function getPosition(div) {
 function checkForMove() {
     if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X &&
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.landingPosition.X) {
-        (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
+        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player) {
+            (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
+        }
+        else {
+            (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
+        }
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.startingPosition = { X: 0, Y: 0 };
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = { X: 0, Y: 0 };
     }
@@ -247,6 +259,7 @@ function updatePlayerTurn() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   connect: () => (/* binding */ connect),
+/* harmony export */   gameplay: () => (/* binding */ gameplay),
 /* harmony export */   player: () => (/* binding */ player),
 /* harmony export */   sendMsg: () => (/* binding */ sendMsg)
 /* harmony export */ });
