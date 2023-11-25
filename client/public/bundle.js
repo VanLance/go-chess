@@ -234,7 +234,6 @@ function updatePlayerTurn() {
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
 (async () => { (await startGame()); })();
-// connect()
 document.getElementById('webpack-connect')?.addEventListener('click', _websocket__WEBPACK_IMPORTED_MODULE_1__.connect);
 
 

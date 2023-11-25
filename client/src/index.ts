@@ -65,7 +65,6 @@ function updatePlayerTurn(){
 
 (async () => { (await startGame()) })()
 
-// connect()
 document.getElementById('webpack-connect')?.addEventListener('click',connect)
 
 

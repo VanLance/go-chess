@@ -47,7 +47,6 @@ let sendMsg = (msg: any)=> {
 };
 
 
-
 document.getElementById('webpack-broadcast')?.addEventListener('click',()=>{sendMsg("TEST")})
 
 export {
