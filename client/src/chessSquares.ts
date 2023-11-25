@@ -47,14 +47,18 @@ function createChessDiv(number: number, letter: string): HTMLDivElement {
     div.classList.add('chess-square');
   }
   div.addEventListener('click', () => {
-    getPosition(div);
+    if (player) {
+      getPosition(div);
+    } else {
+      getPosition(div, chessState.playerTurn);
+    }
     checkForMove();
   });
   return div;
 }
 
 function addChessSquare(div: HTMLDivElement) {
-  document.getElementsByTagName('main')[0]?.appendChild(div);
+  document.querySelector('.chess-board')!.appendChild(div);
 }
 
 function addPieces(...pieces: Array<Piece>) {
@@ -114,13 +118,15 @@ function checkCastle(player: Player, div: HTMLDivElement) {
   }
 }
 
-function getPosition( div: HTMLDivElement) {
-  console.log(player, "PLAYER !")
-  if ( player.Team == chessState.playerTurn.Team ){
+function getPosition( div: HTMLDivElement, checkPlayer: Player | null = null) {
+  if ( !checkPlayer ) {
+    checkPlayer = player
+  }
+  if ( checkPlayer.Team == chessState.playerTurn.Team ){
     const squarePlayer = getPlayerFromDiv(div.classList);
     if (
-      player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
-      !checkCastle(player, div)
+      checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
+      !checkCastle(checkPlayer, div)
     ) {
       clearActiveSquare();
       chessState.move = {
@@ -139,7 +145,11 @@ function checkForMove() {
     chessState.move?.startingPosition.X &&
     chessState.move?.landingPosition.X
     ) {
-    sendMsg(JSON.stringify(chessState.move))
+      if (player) {
+        sendMsg(JSON.stringify(chessState.move))
+      } else {
+        makeMove()
+      }
     chessState.move.startingPosition = { X: 0, Y: 0 };
     chessState.move.landingPosition = { X: 0, Y: 0 };
   }

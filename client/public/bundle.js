@@ -67,13 +67,18 @@ function createChessDiv(number, letter) {
         div.classList.add('chess-square');
     }
     div.addEventListener('click', () => {
-        getPosition(div);
+        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player) {
+            getPosition(div);
+        }
+        else {
+            getPosition(div, _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn);
+        }
         checkForMove();
     });
     return div;
 }
 function addChessSquare(div) {
-    document.getElementsByTagName('main')[0]?.appendChild(div);
+    document.querySelector('.chess-board').appendChild(div);
 }
 function addPieces(...pieces) {
     for (const piece of pieces) {
@@ -120,12 +125,14 @@ function checkCastle(player, div) {
         }
     }
 }
-function getPosition(div) {
-    console.log(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, "PLAYER !");
-    if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
+function getPosition(div, checkPlayer = null) {
+    if (!checkPlayer) {
+        checkPlayer = _websocket__WEBPACK_IMPORTED_MODULE_1__.player;
+    }
+    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
         const squarePlayer = getPlayerFromDiv(div.classList);
-        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
-            !checkCastle(_websocket__WEBPACK_IMPORTED_MODULE_1__.player, div)) {
+        if (checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
+            !checkCastle(checkPlayer, div)) {
             clearActiveSquare();
             _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = {
                 startingPosition: getPositionFromDivId(div.id),
@@ -141,7 +148,12 @@ function getPosition(div) {
 function checkForMove() {
     if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X &&
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.landingPosition.X) {
-        (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
+        if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player) {
+            (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
+        }
+        else {
+            (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
+        }
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.startingPosition = { X: 0, Y: 0 };
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move.landingPosition = { X: 0, Y: 0 };
     }
@@ -170,15 +182,12 @@ function getPlayerFromDiv(divClassList) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   chessState: () => (/* binding */ chessState),
-/* harmony export */   makeMove: () => (/* binding */ makeMove)
+/* harmony export */   makeMove: () => (/* binding */ makeMove),
+/* harmony export */   startGame: () => (/* binding */ startGame)
 /* harmony export */ });
 /* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
-/* harmony import */ var _websocket__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./websocket */ "./src/websocket.ts");
-
 
 let chessState;
-(0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
-(0,_websocket__WEBPACK_IMPORTED_MODULE_1__.connect)();
 async function startGame() {
     const res = await fetch("http://localhost:8080/");
     if (res.ok) {
@@ -233,8 +242,6 @@ function updatePlayerTurn() {
     let playerTurnP = document.getElementById('player-turn');
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
-(async () => { (await startGame()); })();
-document.getElementById('webpack-connect')?.addEventListener('click', _websocket__WEBPACK_IMPORTED_MODULE_1__.connect);
 
 
 
@@ -249,52 +256,73 @@ document.getElementById('webpack-connect')?.addEventListener('click', _websocket
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   connect: () => (/* binding */ connect),
+/* harmony export */   gameplay: () => (/* binding */ gameplay),
 /* harmony export */   player: () => (/* binding */ player),
 /* harmony export */   sendMsg: () => (/* binding */ sendMsg)
 /* harmony export */ });
-/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./src/index.ts");
+/* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./src/index.ts");
 
-var socket = new WebSocket("ws://localhost:8080/ws");
+
 let player;
-let connect = () => {
-    console.log("Attempting Connection...");
-    socket.onopen = () => {
-        console.log("Successfully Connected");
-    };
-    socket.onmessage = event => {
-        let message = JSON.parse(event.data);
-        if (message.body === "player-1") {
-            player = {
-                username: '',
-                Team: 1
+let connect;
+let sendMsg;
+let socket;
+let gameplay;
+const main = document.getElementsByTagName('main')[0];
+const gameplayForm = document.querySelector("#gameplay-form");
+gameplayForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
+    main.classList.toggle('hide');
+    const selectGameplay = document.querySelector('#game-play');
+    gameplay = selectGameplay.value;
+    console.log(gameplay);
+    if (gameplay == 'online') {
+        socket = new WebSocket("ws://localhost:8080/ws");
+        connect = () => {
+            console.log("Attempting Connection...");
+            socket.onopen = () => {
+                console.log("Successfully Connected");
             };
-        }
-        else if (message.body === "player-2") {
-            player = {
-                username: '',
-                Team: 2
+            socket.onmessage = event => {
+                console.log("ON MESSAGE");
+                let message = JSON.parse(event.data);
+                if (message.body === "player-1") {
+                    player = {
+                        username: '',
+                        Team: 1
+                    };
+                }
+                else if (message.body === "player-2") {
+                    player = {
+                        username: '',
+                        Team: 2
+                    };
+                }
+                else {
+                    message = JSON.parse(message.body);
+                    _index__WEBPACK_IMPORTED_MODULE_1__.chessState.move = message;
+                    (0,_index__WEBPACK_IMPORTED_MODULE_1__.makeMove)();
+                }
+                console.log("Received message:", message);
+                console.log(player);
             };
-        }
-        else {
-            message = JSON.parse(message.body);
-            _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move = message;
-            (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
-        }
-        console.log("Received message:", message);
-        console.log(player);
-    };
-    socket.onclose = event => {
-        console.log("Socket Closed Connection: ", event);
-    };
-    socket.onerror = error => {
-        console.log("Socket Error: ", error);
-    };
-};
-let sendMsg = (msg) => {
+            socket.onclose = event => {
+                console.log("Socket Closed Connection: ", event);
+            };
+            socket.onerror = error => {
+                console.log("Socket Error: ", error);
+            };
+        };
+        connect();
+    }
+    await (0,_index__WEBPACK_IMPORTED_MODULE_1__.startGame)();
+});
+sendMsg = (msg) => {
     console.log("sending msg: ", msg);
     socket.send(msg);
 };
-document.getElementById('webpack-broadcast')?.addEventListener('click', () => { sendMsg("TEST"); });
 
 
 

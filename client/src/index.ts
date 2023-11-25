@@ -1,12 +1,9 @@
 import { addPieces, clearPieces, createChessSquares } from './chessSquares'
 import { ChessState } from './types'
-import { connect } from './websocket'
+import { connect, gameplay, player } from './websocket'
 
-let chessState: ChessState
+let chessState: ChessState 
 
-createChessSquares()
-
-connect()
 
 async function startGame(){
   const res = await fetch("http://localhost:8080/")
@@ -63,13 +60,10 @@ function updatePlayerTurn(){
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
 
-(async () => { (await startGame()) })()
-
-document.getElementById('webpack-connect')?.addEventListener('click',connect)
-
 
 export {
   makeMove,
   chessState,
+  startGame
 }
 
