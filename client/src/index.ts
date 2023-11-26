@@ -4,7 +4,6 @@ import { connect, gameplay, player } from './websocket'
 
 let chessState: ChessState 
 
-
 async function startGame(){
   const res = await fetch("http://localhost:8080/")
   if (res.ok) {
@@ -59,10 +58,6 @@ function updatePlayerTurn(){
   let playerTurnP = document.getElementById('player-turn')!
   playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length -2) + ' ' + chessState.playerTurn.Team
 }
-
-// (async () => { 
-//   await startGame()
-// })()
 
 export {
   makeMove,

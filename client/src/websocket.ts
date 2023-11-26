@@ -21,8 +21,9 @@ gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
   main.classList.toggle('hide')
 
   const selectGameplay = document.querySelector('#game-play')! as HTMLSelectElement
+
   gameplay = selectGameplay.value as 'online' | 'local'
-  console.log(gameplay)
+  
   if (gameplay == 'online'){
     socket = new WebSocket("ws://localhost:8080/ws");
     connect = () => {
@@ -32,26 +33,26 @@ gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
         console.log("Successfully Connected");
       };
       
-      socket.onmessage = event => {
-        console.log("ON MESSAGE")
+      socket.onmessage = async event => {
         let message = JSON.parse(event.data);
         if (message.body === "player-1"){
           player = {
             username: '',
             Team: 1
           }
+          chessState.playing = false
         } else if (message.body === "player-2"){
           player = {
             username: '',
             Team: 2
           }
+          chessState.playing = true
         } else {
           message = JSON.parse(message.body)
           chessState.move = message
           makeMove()
         }
         console.log("Received message:", message);
-        console.log(player)
       }
       
       socket.onclose = event => {
@@ -63,12 +64,10 @@ gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
       };
     };
     connect()
-
-  }
+  } 
   await startGame()
-}
+})
 
-)
 sendMsg = (msg: any) => {
   console.log("sending msg: ", msg);
   socket.send(msg);

@@ -122,7 +122,7 @@ function getPosition( div: HTMLDivElement, checkPlayer: Player | null = null) {
   if ( !checkPlayer ) {
     checkPlayer = player
   }
-  if ( checkPlayer.Team == chessState.playerTurn.Team ){
+  if ( checkPlayer.Team == chessState.playerTurn.Team && chessState.playing ){
     const squarePlayer = getPlayerFromDiv(div.classList);
     if (
       checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&

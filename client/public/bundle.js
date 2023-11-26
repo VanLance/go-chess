@@ -129,7 +129,7 @@ function getPosition(div, checkPlayer = null) {
     if (!checkPlayer) {
         checkPlayer = _websocket__WEBPACK_IMPORTED_MODULE_1__.player;
     }
-    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
+    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team && _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playing) {
         const squarePlayer = getPlayerFromDiv(div.classList);
         if (checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
             !checkCastle(checkPlayer, div)) {
@@ -242,9 +242,6 @@ function updatePlayerTurn() {
     let playerTurnP = document.getElementById('player-turn');
     playerTurnP.innerText = playerTurnP?.innerText.substring(0, playerTurnP.innerHTML?.length - 2) + ' ' + chessState.playerTurn.Team;
 }
-// (async () => { 
-//   await startGame()
-// })()
 
 
 
@@ -280,7 +277,6 @@ gameplayForm.addEventListener("submit", async (e) => {
     main.classList.toggle('hide');
     const selectGameplay = document.querySelector('#game-play');
     gameplay = selectGameplay.value;
-    console.log(gameplay);
     if (gameplay == 'online') {
         socket = new WebSocket("ws://localhost:8080/ws");
         connect = () => {
@@ -288,20 +284,21 @@ gameplayForm.addEventListener("submit", async (e) => {
             socket.onopen = () => {
                 console.log("Successfully Connected");
             };
-            socket.onmessage = event => {
-                console.log("ON MESSAGE");
+            socket.onmessage = async (event) => {
                 let message = JSON.parse(event.data);
                 if (message.body === "player-1") {
                     player = {
                         username: '',
                         Team: 1
                     };
+                    _index__WEBPACK_IMPORTED_MODULE_1__.chessState.playing = false;
                 }
                 else if (message.body === "player-2") {
                     player = {
                         username: '',
                         Team: 2
                     };
+                    _index__WEBPACK_IMPORTED_MODULE_1__.chessState.playing = true;
                 }
                 else {
                     message = JSON.parse(message.body);
@@ -309,7 +306,6 @@ gameplayForm.addEventListener("submit", async (e) => {
                     (0,_index__WEBPACK_IMPORTED_MODULE_1__.makeMove)();
                 }
                 console.log("Received message:", message);
-                console.log(player);
             };
             socket.onclose = event => {
                 console.log("Socket Closed Connection: ", event);

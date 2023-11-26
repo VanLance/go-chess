@@ -7,6 +7,7 @@ type ChessState = {
   move?: Move
   playerTurn: Player
   pieces: Array<Piece>
+  playing?: boolean 
 }
 
 type Piece = Position & {
