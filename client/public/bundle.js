@@ -129,7 +129,7 @@ function getPosition(div, checkPlayer = null) {
     if (!checkPlayer) {
         checkPlayer = _websocket__WEBPACK_IMPORTED_MODULE_1__.player;
     }
-    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team && _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playing) {
+    if (checkPlayer.Team == _index__WEBPACK_IMPORTED_MODULE_0__.chessState.playerTurn.Team) {
         const squarePlayer = getPlayerFromDiv(div.classList);
         if (checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
             !checkCastle(checkPlayer, div)) {
