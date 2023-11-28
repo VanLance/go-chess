@@ -163,6 +163,17 @@ func (c ChessPlay) castleKing(move Move) {
 	} else {
 		yLanding = 8
 	}
-	c.acceptMove(Move{move.LandingPosition, Position{X: kingXLanding, Y: yLanding}, move.player})
-	c.acceptMove(Move{move.StartingPosition, Position{X: rookXLanding, Y: yLanding}, move.player})
+	c.acceptMove(c.squares[move.LandingPosition] ,Move{move.LandingPosition, Position{X: kingXLanding, Y: yLanding}, move.player})
+	c.acceptMove(c.squares[move.StartingPosition], Move{move.StartingPosition, Position{X: rookXLanding, Y: yLanding}, move.player})
 }
+
+func (c *ChessPlay) checkPawnPosition(piece GamePiece, landingPosition Position) {
+	newQueen := queen
+	if piece.Player.Team == 1 && landingPosition.Y == 8 {
+		newQueen.Team = 1
+		c.squares[landingPosition] = newQueen
+	} else if  piece.Player.Team == 2 && landingPosition.Y == 1 {
+		newQueen.Team = 2
+		c.squares[landingPosition] = newQueen
+	}
+} 
