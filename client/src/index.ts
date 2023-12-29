@@ -20,7 +20,7 @@ async function startGame(){
 }
 
 async function makeMove() {
-  const res = await fetch("http://localhost:8080/make-move", {
+  const res = await fetch("https://go-chess.onrender.com/make-move", {
     method: "POST",
     headers: {
       "Content-Type": 'application/json'
