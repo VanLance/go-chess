@@ -149,7 +149,7 @@ function checkForMove() {
     if (_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.startingPosition.X &&
         _index__WEBPACK_IMPORTED_MODULE_0__.chessState.move?.landingPosition.X) {
         if (_websocket__WEBPACK_IMPORTED_MODULE_1__.player) {
-            (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(JSON.stringify(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move));
+            (0,_websocket__WEBPACK_IMPORTED_MODULE_1__.sendMsg)(_index__WEBPACK_IMPORTED_MODULE_0__.chessState.move);
         }
         else {
             (0,_index__WEBPACK_IMPORTED_MODULE_0__.makeMove)();
@@ -247,6 +247,26 @@ function updatePlayerTurn() {
 
 /***/ }),
 
+/***/ "./src/uiMessage.ts":
+/*!**************************!*\
+  !*** ./src/uiMessage.ts ***!
+  \**************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   updatePTag: () => (/* binding */ updatePTag)
+/* harmony export */ });
+const pTag = document.querySelector('#player-turn');
+function updatePTag() {
+    //  pTag.innerText = chessState.playing == false ? "Waiting on Player 2" : pTag.innerText 
+    pTag.innerText = "Waiting on Player 2";
+}
+
+
+
+/***/ }),
+
 /***/ "./src/websocket.ts":
 /*!**************************!*\
   !*** ./src/websocket.ts ***!
@@ -262,6 +282,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _chessSquares__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chessSquares */ "./src/chessSquares.ts");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./src/index.ts");
+/* harmony import */ var _uiMessage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./uiMessage */ "./src/uiMessage.ts");
+
 
 
 let player;
@@ -271,11 +293,12 @@ let socket;
 let gameplay;
 const main = document.getElementsByTagName('main')[0];
 const gameplayForm = document.querySelector("#gameplay-form");
+const selectGameplay = document.querySelector('#game-play');
 gameplayForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
+    await (0,_index__WEBPACK_IMPORTED_MODULE_1__.startGame)();
     main.classList.toggle('hide');
-    const selectGameplay = document.querySelector('#game-play');
     gameplay = selectGameplay.value;
     if (gameplay == 'online') {
         socket = new WebSocket("ws://localhost:8080/ws");
@@ -298,12 +321,18 @@ gameplayForm.addEventListener("submit", async (e) => {
                         username: '',
                         Team: 2
                     };
+                    sendMsg("Player-2 Joined");
+                    _index__WEBPACK_IMPORTED_MODULE_1__.chessState.playing = true;
+                }
+                else if (message.body === "Player-2 Joined") {
                     _index__WEBPACK_IMPORTED_MODULE_1__.chessState.playing = true;
                 }
                 else {
                     message = JSON.parse(message.body);
-                    _index__WEBPACK_IMPORTED_MODULE_1__.chessState.move = message;
-                    (0,_index__WEBPACK_IMPORTED_MODULE_1__.makeMove)();
+                    if (message.hasOwnProperty('startingPosition') && message.hasOwnProperty('landingPosition')) {
+                        _index__WEBPACK_IMPORTED_MODULE_1__.chessState.move = message;
+                        (0,_index__WEBPACK_IMPORTED_MODULE_1__.makeMove)();
+                    }
                 }
                 console.log("Received message:", message);
             };
@@ -316,11 +345,11 @@ gameplayForm.addEventListener("submit", async (e) => {
         };
         connect();
     }
-    await (0,_index__WEBPACK_IMPORTED_MODULE_1__.startGame)();
+    (0,_uiMessage__WEBPACK_IMPORTED_MODULE_2__.updatePTag)();
 });
 sendMsg = (msg) => {
     console.log("sending msg: ", msg);
-    socket.send(msg);
+    socket.send(JSON.stringify(msg));
 };
 
 

@@ -1,5 +1,5 @@
 import { makeMove, chessState } from './index';
-import { ChessColumn, Move, Piece, Player, Position } from './types';
+import { ChessColumn, Piece, Player, Position } from './types';
 import { player, sendMsg } from "./websocket"
 
 const xNumbers: { [key: number]: string } = {
@@ -118,11 +118,11 @@ function checkCastle(player: Player, div: HTMLDivElement) {
   }
 }
 
-function getPosition( div: HTMLDivElement, checkPlayer: Player | null = null) {
+function getPosition( div: HTMLDivElement, checkPlayer: Player | null = null ) {
   if ( !checkPlayer ) {
     checkPlayer = player
   }
-  if ( checkPlayer.Team == chessState.playerTurn.Team  ){
+  if ( checkPlayer.Team == chessState.playerTurn.Team){
     const squarePlayer = getPlayerFromDiv(div.classList);
     if (
       checkPlayer.Team.toString() === squarePlayer?.[squarePlayer.length - 1] &&
@@ -146,7 +146,7 @@ function checkForMove() {
     chessState.move?.landingPosition.X
     ) {
       if (player) {
-        sendMsg(JSON.stringify(chessState.move))
+      sendMsg(chessState.move)
       } else {
         makeMove()
       }
