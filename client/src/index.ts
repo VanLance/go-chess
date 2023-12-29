@@ -4,7 +4,7 @@ import { ChessState } from './types'
 let chessState: ChessState 
 
 async function startGame(){
-  const res = await fetch("http://localhost:8080/")
+  const res = await fetch("https://go-chess.onrender.com")
   if (res.ok) {
     const data = await res.json()
     chessState = {
