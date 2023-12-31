@@ -14,7 +14,23 @@ const testApi = async () => {
 (async () => { console.log(await testApi()) })();
 (async () => { (await firstMove()) })()
 
-
+async function firstMove() {
+  const pieces = await testApi()
+  const res = await fetch("http://localhost:8080/make-move", {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json'
+    },
+    body: JSON.stringify({
+      previousState: [...pieces.PlayerOnePieces, ...pieces.PlayerTwoPieces],
+      move: {
+        startingPosition: "A2",
+        landingPosition: "A3",
+        player: 1
+      }
+    })
+  })
+}
 async function firstMove() {
   const pieces = await testApi()
   const res = await fetch("http://localhost:8080/make-move", {
@@ -38,4 +54,10 @@ async function firstMove() {
   //   console.error('HTTP error:', res.status);
   // }
 }
-
+function foo(test){
+  const bar = 'foo'
+  for ( let i = 0; i < bar.length; i++ ){
+    console.log(i, bar[i])
+    if( i < test.length){}
+  }
+}

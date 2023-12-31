@@ -60,6 +60,9 @@ gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
       
       socket.onclose = event => {
         console.log("Socket Closed Connection: ", event);
+        setTimeout(() => {
+          connect();
+      }, 1000)
       };
       
       socket.onerror = error => {
