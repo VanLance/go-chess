@@ -6,6 +6,12 @@ body {
   color: hotpink; 
 } 
 
+main{
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
 .chess-board {
   margin-top: 20px;
   display: grid;

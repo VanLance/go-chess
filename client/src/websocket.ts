@@ -19,6 +19,7 @@ gameplayForm.addEventListener("submit", async (e:SubmitEvent)=> {
   createChessSquares()
   await startGame()
   main.classList.toggle('hide')
+  gameplayForm.classList.toggle('hide')
 
   gameplay = selectGameplay.value as 'online' | 'local'
   

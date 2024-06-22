@@ -189,7 +189,7 @@ __webpack_require__.r(__webpack_exports__);
 
 let chessState;
 async function startGame() {
-    const res = await fetch("http://localhost:8080/");
+    const res = await fetch("https://go-chess.onrender.com");
     if (res.ok) {
         const data = await res.json();
         chessState = {
@@ -205,7 +205,7 @@ async function startGame() {
     }
 }
 async function makeMove() {
-    const res = await fetch("http://localhost:8080/make-move", {
+    const res = await fetch("https://go-chess.onrender.com/make-move", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json'
@@ -299,6 +299,7 @@ gameplayForm.addEventListener("submit", async (e) => {
     (0,_chessSquares__WEBPACK_IMPORTED_MODULE_0__.createChessSquares)();
     await (0,_index__WEBPACK_IMPORTED_MODULE_1__.startGame)();
     main.classList.toggle('hide');
+    gameplayForm.classList.toggle('hide');
     gameplay = selectGameplay.value;
     if (gameplay == 'online') {
         socket = new WebSocket("ws://localhost:8080/ws");
